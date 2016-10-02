@@ -1,0 +1,17 @@
+{
+    "name": "drupal-composer/drupal-finder",
+    "description": "Helper class to locate a Drupal installation from a given path.",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Florian Weber",
+            "email": "florian@webflo.org"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "classmap": [
+            "src/DrupalFinder.php"
+        ]
+    }
+}
