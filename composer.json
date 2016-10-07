@@ -1,5 +1,5 @@
 {
-    "name": "drupal-composer/drupal-finder",
+    "name": "webflo/drupal-finder",
     "description": "Helper class to locate a Drupal installation from a given path.",
     "type": "library",
     "authors": [
