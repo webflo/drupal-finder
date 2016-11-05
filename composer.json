@@ -1,6 +1,7 @@
 {
     "name": "webflo/drupal-finder",
     "description": "Helper class to locate a Drupal installation from a given path.",
+    "license": "GPL-2.0+",
     "type": "library",
     "authors": [
         {
