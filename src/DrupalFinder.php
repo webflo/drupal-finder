@@ -102,4 +102,18 @@ class DrupalFinder {
     return FALSE;
   }
 
+  /**
+   * @return string
+   */
+  public function getDrupalRoot() {
+    return $this->drupalRoot;
+  }
+
+  /**
+   * @return string
+   */
+  public function getProjectRoot() {
+    return $this->projectRoot;
+  }
+
 }
