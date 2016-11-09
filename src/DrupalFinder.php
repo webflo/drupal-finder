@@ -9,6 +9,16 @@ namespace DrupalFinder;
 
 class DrupalFinder {
 
+  /**
+   * @var string
+   */
+  private $drupalRoot;
+
+  /**
+   * @var string
+   */
+  private $projectRoot;
+
   public function locateRoot($start_path) {
     $drupal_root = FALSE;
 
