@@ -24,7 +24,8 @@ class DrupalFinder {
   private $composerRoot;
 
   public function locateRoot($start_path) {
-    $drupal_root = FALSE;
+    $this->drupalRoot = FALSE;
+    $this->composerRoot = FALSE;
 
     foreach (array(TRUE, FALSE) as $follow_symlinks) {
       $path = $start_path;
@@ -33,8 +34,7 @@ class DrupalFinder {
       }
       // Check the start path.
       if ($checked_path = $this->isValidRoot($path)) {
-        $drupal_root = $checked_path;
-        break;
+        return $checked_path;
       }
       else {
         // Move up dir by dir and check each.
@@ -43,14 +43,13 @@ class DrupalFinder {
             $path = realpath($path);
           }
           if ($checked_path = $this->isValidRoot($path)) {
-            $drupal_root = $checked_path;
-            break 2;
+            return $checked_path;
           }
         }
       }
     }
 
-    return $drupal_root;
+    return FALSE;
   }
 
   /**
@@ -75,9 +74,9 @@ class DrupalFinder {
   /**
    * @param $path
    *
-   * @return boolean
+   * @return string|FALSE
    */
-  public function isValidRoot($path) {
+  protected function isValidRoot($path) {
     if (!empty($path) && is_dir($path) && file_exists($path . '/autoload.php')) {
       // Additional check for the presence of core/composer.json to
       // grant it is not a Drupal 7 site with a base folder named "core".
@@ -86,6 +85,7 @@ class DrupalFinder {
         if (file_exists($path . '/core/misc/drupal.js') || file_exists($path . '/core/assets/js/drupal.js')) {
           $this->composerRoot = $path;
           $this->drupalRoot = $path;
+          return TRUE;
         }
       }
     }
