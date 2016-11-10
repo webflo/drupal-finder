@@ -10,14 +10,18 @@ namespace DrupalFinder;
 class DrupalFinder {
 
   /**
+   * Drupal web public directory.
+   *
    * @var string
    */
   private $drupalRoot;
 
   /**
+   * Drupal package composer directory.
+   *
    * @var string
    */
-  private $projectRoot;
+  private $composerRoot;
 
   public function locateRoot($start_path) {
     $drupal_root = FALSE;
@@ -80,7 +84,7 @@ class DrupalFinder {
       $candidate = 'core/includes/common.inc';
       if (file_exists($path . '/' . $candidate) && file_exists($path . '/core/core.services.yml')) {
         if (file_exists($path . '/core/misc/drupal.js') || file_exists($path . '/core/assets/js/drupal.js')) {
-          $this->projectRoot = $path;
+          $this->composerRoot = $path;
           $this->drupalRoot = $path;
         }
       }
@@ -91,7 +95,7 @@ class DrupalFinder {
         if (isset($json['extra']['installer-paths']) && is_array($json['extra']['installer-paths'])) {
           foreach ($json['extra']['installer-paths'] as $install_path => $items) {
             if (in_array('type:drupal-core', $items)) {
-              $this->projectRoot = $path;
+              $this->composerRoot = $path;
               $this->drupalRoot = $path . '/' . substr($install_path, 0, -5);
               return TRUE;
             }
@@ -112,8 +116,8 @@ class DrupalFinder {
   /**
    * @return string
    */
-  public function getProjectRoot() {
-    return $this->projectRoot;
+  public function getComposerRoot() {
+    return $this->composerRoot;
   }
 
 }
