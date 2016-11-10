@@ -2,7 +2,7 @@
 <phpunit colors="true">
   <testsuites>
     <testsuite name="DrupalFinter Test Suite">
-      <directory>./Tests</directory>
+      <directory>./tests</directory>
     </testsuite>
   </testsuites>
 </phpunit>
