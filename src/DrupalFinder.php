@@ -9,6 +9,20 @@ namespace DrupalFinder;
 
 class DrupalFinder {
 
+  /**
+   * Drupal web public directory.
+   *
+   * @var string
+   */
+  private $drupalRoot;
+
+  /**
+   * Drupal package composer directory.
+   *
+   * @var string
+   */
+  private $composerRoot;
+
   public function locateRoot($start_path) {
     $drupal_root = FALSE;
 
@@ -61,7 +75,7 @@ class DrupalFinder {
   /**
    * @param $path
    *
-   * @return string|FALSE
+   * @return boolean
    */
   public function isValidRoot($path) {
     if (!empty($path) && is_dir($path) && file_exists($path . '/autoload.php')) {
@@ -70,7 +84,8 @@ class DrupalFinder {
       $candidate = 'core/includes/common.inc';
       if (file_exists($path . '/' . $candidate) && file_exists($path . '/core/core.services.yml')) {
         if (file_exists($path . '/core/misc/drupal.js') || file_exists($path . '/core/assets/js/drupal.js')) {
-          return $path;
+          $this->composerRoot = $path;
+          $this->drupalRoot = $path;
         }
       }
     }
@@ -80,13 +95,29 @@ class DrupalFinder {
         if (isset($json['extra']['installer-paths']) && is_array($json['extra']['installer-paths'])) {
           foreach ($json['extra']['installer-paths'] as $install_path => $items) {
             if (in_array('type:drupal-core', $items)) {
-              return $path . '/' . substr($install_path, 0, -5);
+              $this->composerRoot = $path;
+              $this->drupalRoot = $path . '/' . substr($install_path, 0, -5);
+              return TRUE;
             }
           }
         }
       }
     }
     return FALSE;
+  }
+
+  /**
+   * @return string
+   */
+  public function getDrupalRoot() {
+    return $this->drupalRoot;
+  }
+
+  /**
+   * @return string
+   */
+  public function getComposerRoot() {
+    return $this->composerRoot;
   }
 
 }
