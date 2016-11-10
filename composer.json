@@ -14,5 +14,9 @@
         "classmap": [
             "src/DrupalFinder.php"
         ]
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^4.8",
+        "mikey179/vfsStream": "^1.6"
     }
 }
