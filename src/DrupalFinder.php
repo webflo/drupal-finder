@@ -77,7 +77,7 @@ class DrupalFinder {
    * @return string|FALSE
    */
   protected function isValidRoot($path) {
-    if (!empty($path) && is_dir($path) && file_exists($path . '/autoload.php')) {
+    if (!empty($path) && is_dir($path) && file_exists($path . '/autoload.php') && file_exists($path . '/composer.json')) {
       // Additional check for the presence of core/composer.json to
       // grant it is not a Drupal 7 site with a base folder named "core".
       $candidate = 'core/includes/common.inc';
@@ -85,7 +85,6 @@ class DrupalFinder {
         if (file_exists($path . '/core/misc/drupal.js') || file_exists($path . '/core/assets/js/drupal.js')) {
           $this->composerRoot = $path;
           $this->drupalRoot = $path;
-          return TRUE;
         }
       }
     }
@@ -97,13 +96,12 @@ class DrupalFinder {
             if (in_array('type:drupal-core', $items)) {
               $this->composerRoot = $path;
               $this->drupalRoot = $path . '/' . substr($install_path, 0, -5);
-              return TRUE;
             }
           }
         }
       }
     }
-    return FALSE;
+    return ($this->drupalRoot && $this->composerRoot);
   }
 
   /**

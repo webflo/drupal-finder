@@ -11,6 +11,7 @@ class DrupalFinderTest extends PHPUnit_Framework_TestCase {
 
   protected static $fileStructure = [
     'autoload.php' => '',
+    'composer.json' => '',
     'core' => [
       'includes' => [
         'common.inc' => '',
@@ -60,7 +61,7 @@ class DrupalFinderTest extends PHPUnit_Framework_TestCase {
         ],
       ])
     ];
-    unset($fileStructure['web']['autoload.php']);
+    unset($fileStructure['web']['composer.json']);
 
     $root = vfsStream::setup('root', null, $fileStructure);
     $this->assertTrue($this->finder->locateRoot($root->url() . '/web'));
