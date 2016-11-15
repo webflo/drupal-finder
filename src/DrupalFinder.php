@@ -25,22 +25,21 @@ class DrupalFinder {
   private $composerRoot;
 
   public function locateRoot($start_path) {
-    $start_path = new SplFileInfo($start_path);
     $this->drupalRoot = FALSE;
     $this->composerRoot = FALSE;
 
     foreach (array(TRUE, FALSE) as $follow_symlinks) {
-      for ($path = $start_path;
-           $path->getFilename() != '.';
-           $path = $path->getPathInfo()) {
+      $path = new SplFileInfo($start_path);
+      do {
         if ($follow_symlinks && $path->isLink()) {
           $path = $path->getRealPath();
         }
         // Check the start path.
-        if ($checked_path = $this->isValidRoot($path->getPathname())) {
-          return $checked_path;
+        if ($this->isValidRoot($path->getPathname())) {
+          return TRUE;
         }
-      };
+      }
+      while (($path = $path->getPathInfo()) && ($path->getFilename() != '.'));
     }
 
     return FALSE;
@@ -49,7 +48,7 @@ class DrupalFinder {
   /**
    * @param $path
    *
-   * @return string|FALSE
+   * @return bool
    */
   protected function isValidRoot($path) {
     if (!empty($path) && is_dir($path) && file_exists($path . '/autoload.php') && file_exists($path . '/composer.json')) {
