@@ -32,7 +32,7 @@ class DrupalFinder {
       $path = new SplFileInfo($start_path);
       do {
         if ($follow_symlinks && $path->isLink()) {
-          $path = $path->getRealPath();
+          $path = new SplFileInfo($path->getRealPath());
         }
         // Check the start path.
         if ($this->isValidRoot($path->getPathname())) {
