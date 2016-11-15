@@ -47,27 +47,6 @@ class DrupalFinder {
   }
 
   /**
-   * Returns parent directory.
-   *
-   * @deprecated does not work with streamWrappers on Windows
-   *
-   * @param string
-   *   Path to start from.
-   *
-   * @return string
-   *   Parent path of given path.
-   */
-  public function shiftPathUp($path) {
-    if (empty($path)) {
-      return FALSE;
-    }
-    $path = explode(DIRECTORY_SEPARATOR, $path);
-    // Move one directory up.
-    array_pop($path);
-    return implode(DIRECTORY_SEPARATOR, $path);
-  }
-
-  /**
    * @param $path
    *
    * @return string|FALSE
