@@ -108,10 +108,11 @@ class DrupalFinderTest extends PHPUnit_Framework_TestCase {
     $this->assertSame($root, $this->finder->getComposerRoot());
   }
 
-  /**
-   * @requires OS Linux|Darwin
-   */
   public function testDrupalComposerStructureWithSymlink() {
+    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+      $this->markTestSkipped('Symlinks are not supported by Windows');
+    }
+
     $root = $this->tempdir(sys_get_temp_dir());
     $this->dumpToFileSystem($this->getDrupalComposerStructure(), $root);
 
