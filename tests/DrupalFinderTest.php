@@ -90,23 +90,27 @@ class DrupalFinderTest extends PHPUnit_Framework_TestCase {
     $this->assertFalse($this->finder->getComposerRoot());
   }
 
-  public function testWithRealFilesystem() {
+  public function testDrupalDefaultStructureWithRealFilesystem() {
     $root = $this->tempdir(sys_get_temp_dir());
     $this->dumpToFileSystem(static::$fileStructure, $root);
 
     $this->assertTrue($this->finder->locateRoot($root));
     $this->assertSame($root, $this->finder->getDrupalRoot());
     $this->assertSame($root, $this->finder->getComposerRoot());
-
-    // Test symlink implementation
-    $symlink = $this->tempdir(sys_get_temp_dir());
-    symlink($root, $symlink . '/foo');
-
-    $this->assertTrue($this->finder->locateRoot($symlink . '/foo'));
-    $this->assertSame(realpath($root), $this->finder->getDrupalRoot());
-    $this->assertSame(realpath($root), $this->finder->getComposerRoot());
   }
 
+  public function testDrupalComposerStructureWithRealFilesystem() {
+    $root = $this->tempdir(sys_get_temp_dir());
+    $this->dumpToFileSystem($this->getDrupalComposerStructure(), $root);
+
+    $this->assertTrue($this->finder->locateRoot($root));
+    $this->assertSame($root . '/web', $this->finder->getDrupalRoot());
+    $this->assertSame($root, $this->finder->getComposerRoot());
+  }
+
+  /**
+   * @requires OS Linux|Darwin
+   */
   public function testDrupalComposerStructureWithSymlink() {
     $root = $this->tempdir(sys_get_temp_dir());
     $this->dumpToFileSystem($this->getDrupalComposerStructure(), $root);
