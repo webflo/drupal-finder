@@ -6,6 +6,7 @@
  */
 
 namespace DrupalFinder;
+use SplFileInfo;
 
 class DrupalFinder {
 
@@ -24,29 +25,22 @@ class DrupalFinder {
   private $composerRoot;
 
   public function locateRoot($start_path) {
+    $start_path = new SplFileInfo($start_path);
     $this->drupalRoot = FALSE;
     $this->composerRoot = FALSE;
 
     foreach (array(TRUE, FALSE) as $follow_symlinks) {
-      $path = $start_path;
-      if ($follow_symlinks && is_link($path)) {
-        $path = realpath($path);
-      }
-      // Check the start path.
-      if ($checked_path = $this->isValidRoot($path)) {
-        return $checked_path;
-      }
-      else {
-        // Move up dir by dir and check each.
-        while ($path = $this->shiftPathUp($path)) {
-          if ($follow_symlinks && is_link($path)) {
-            $path = realpath($path);
-          }
-          if ($checked_path = $this->isValidRoot($path)) {
-            return $checked_path;
-          }
+      for ($path = $start_path;
+           $path->getFilename() != '.';
+           $path = $path->getPathInfo()) {
+        if ($follow_symlinks && $path->isLink()) {
+          $path = $path->getRealPath();
         }
-      }
+        // Check the start path.
+        if ($checked_path = $this->isValidRoot($path->getPathname())) {
+          return $checked_path;
+        }
+      };
     }
 
     return FALSE;
@@ -54,6 +48,8 @@ class DrupalFinder {
 
   /**
    * Returns parent directory.
+   *
+   * @deprecated does not work with streamWrappers on Windows
    *
    * @param string
    *   Path to start from.
