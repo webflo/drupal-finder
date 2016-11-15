@@ -6,6 +6,7 @@
  */
 
 namespace DrupalFinder;
+
 use SplFileInfo;
 
 class DrupalFinder {
