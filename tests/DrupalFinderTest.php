@@ -149,8 +149,16 @@ class DrupalFinderTest extends PHPUnit_Framework_TestCase {
   }
 
   static function tempdir_remove($path) {
-    $scandir = is_link($path) ? [] : scandir($path);
-    foreach ($scandir as $child) {
+    if (is_link($path)) {
+      if (defined('PHP_WINDOWS_VERSION_BUILD')){
+        rmdir($path);
+      } else {
+        unlink($path);
+      }
+      return;
+    }
+
+    foreach (scandir($path) as $child) {
       if (in_array($child, ['.', '..'])) {
         continue;
       }
