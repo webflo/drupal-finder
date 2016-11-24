@@ -103,8 +103,8 @@ class DrupalFinderTest extends PHPUnit_Framework_TestCase {
     symlink($root, $symlink . '/foo');
 
     $this->assertTrue($this->finder->locateRoot($symlink . '/foo'));
-    $this->assertSame(realpath($root), $this->finder->getDrupalRoot());
-    $this->assertSame(realpath($root), $this->finder->getComposerRoot());
+    $this->assertSame($root, $this->finder->getDrupalRoot());
+    $this->assertSame($root, $this->finder->getComposerRoot());
   }
 
   public function testDrupalComposerStructureWithSymlink() {
@@ -120,8 +120,8 @@ class DrupalFinderTest extends PHPUnit_Framework_TestCase {
     symlink($root, $symlink . '/foo');
 
     $this->assertTrue($this->finder->locateRoot($symlink . '/foo'));
-    $this->assertSame(realpath($root . '/web'), $this->finder->getDrupalRoot());
-    $this->assertSame(realpath($root), $this->finder->getComposerRoot());
+    $this->assertSame($root . '/web', $this->finder->getDrupalRoot());
+    $this->assertSame($root, $this->finder->getComposerRoot());
   }
 
   protected function dumpToFileSystem($fileStructure, $root) {
@@ -144,7 +144,7 @@ class DrupalFinderTest extends PHPUnit_Framework_TestCase {
       $path = $dir . $prefix . mt_rand(0, 9999999);
     }
     while (!mkdir($path, $mode));
-    return $path;
+    return realpath($path);
   }
 
 }
