@@ -58,17 +58,12 @@ class DrupalFinder {
    * @param string
    *   Path to start from.
    *
-   * @return string
-   *   Parent path of given path.
+   * @return string|FALSE
+   *   Parent path of given path or false when $path is filesystem root.
    */
-  public function shiftPathUp($path) {
-    if (empty($path)) {
-      return FALSE;
-    }
-    $path = explode(DIRECTORY_SEPARATOR, $path);
-    // Move one directory up.
-    array_pop($path);
-    return implode(DIRECTORY_SEPARATOR, $path);
+  private function shiftPathUp($path) {
+    $parent = dirname($path);
+    return in_array($parent, ['.', $path]) ? FALSE : $parent;
   }
 
   /**
