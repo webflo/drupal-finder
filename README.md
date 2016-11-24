@@ -8,12 +8,17 @@ Drupal Finder provides a class to locate a Drupal installation in a given path.
 
 ```
 $drupalFinder = new \DrupalFinder\DrupalFinder();
-$drupalRoot = $drupalFinder->locateRoot(getcwd());
+if ($drupalFinder->locateRoot(getcwd())) {
+    $drupalRoot = $drupalFinder->getDrupalRoot());
+    $composerRoot = $drupalFinder->getComposerRoot());
+    ...
+}
 ```
 
-## Example
+## Examples
 
-[Drush Shim](https://github.com/webflo/drush-shim)
+- [Drupal Console Launcher](https://github.com/hechoendrupal/drupal-console-launcher/blob/master/bin/drupal.php)
+- [Drush Shim](https://github.com/webflo/drush-shim) (with webflo/drupal-finder:^0.0.1)
 
 ## License
 
