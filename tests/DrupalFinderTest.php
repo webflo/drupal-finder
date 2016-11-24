@@ -21,6 +21,7 @@ class DrupalFinderTest extends PHPUnit_Framework_TestCase {
       ],
       'core.services.yml' => '',
     ],
+    'modules' => [],
   ];
 
   /**
@@ -130,6 +131,19 @@ class DrupalFinderTest extends PHPUnit_Framework_TestCase {
     $this->assertTrue($this->finder->locateRoot($symlink . '/foo'));
     $this->assertSame($root . '/web', $this->finder->getDrupalRoot());
     $this->assertSame($root, $this->finder->getComposerRoot());
+  }
+
+  public function testDrupalWithLinkedModule() {
+    $root = $this->tempdir(sys_get_temp_dir());
+    $this->dumpToFileSystem(static::$fileStructure, $root);
+
+    $module = $this->tempdir(sys_get_temp_dir());
+    $module_link = $root . '/modules/foo';
+    $this->symlink($module, $module_link);
+
+    $this->assertTrue($this->finder->locateRoot($module_link));
+    $this->assertSame($root, realpath($this->finder->getDrupalRoot()));
+    $this->assertSame($root, realpath($this->finder->getComposerRoot()));
   }
 
   protected function dumpToFileSystem($fileStructure, $root) {
