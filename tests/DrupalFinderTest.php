@@ -116,7 +116,7 @@ class DrupalFinderTest extends PHPUnit_Framework_TestCase {
     $this->assertSame($root, $this->finder->getComposerRoot());
   }
 
-  public function testDrupalComposerStructureWithSymlink() {
+  public function testDrupalComposerStructureWithRealFilesystem() {
     $root = $this->tempdir(sys_get_temp_dir());
     $this->dumpToFileSystem($this->getDrupalComposerStructure(), $root);
 
