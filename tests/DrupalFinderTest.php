@@ -100,7 +100,7 @@ class DrupalFinderTest extends PHPUnit_Framework_TestCase {
 
     // Test symlink implementation
     $symlink = $this->tempdir(sys_get_temp_dir());
-    symlink($root, $symlink . '/foo');
+    $this->symlink($root, $symlink . '/foo');
 
     $this->assertTrue($this->finder->locateRoot($symlink . '/foo'));
     $this->assertSame($root, $this->finder->getDrupalRoot());
@@ -117,7 +117,7 @@ class DrupalFinderTest extends PHPUnit_Framework_TestCase {
 
     // Test symlink implementation
     $symlink = $this->tempdir(sys_get_temp_dir());
-    symlink($root, $symlink . '/foo');
+    $this->symlink($root, $symlink . '/foo');
 
     $this->assertTrue($this->finder->locateRoot($symlink . '/foo'));
     $this->assertSame($root . '/web', $this->finder->getDrupalRoot());
@@ -160,4 +160,31 @@ class DrupalFinderTest extends PHPUnit_Framework_TestCase {
     rmdir($path);
   }
 
+
+  /**
+   * @param $target
+   * @param $link
+   *
+   * @throws PHPUnit_Framework_SkippedTestError
+   *
+   */
+  private function symlink($target, $link) {
+    try {
+      return symlink($target, $link);
+    } catch (Exception $e) {
+      if (
+        defined('PHP_WINDOWS_VERSION_BUILD')
+        && strstr($e->getMessage(), WIN_ERROR_PRIVILEGE_NOT_HELD)
+      ) {
+        $this->markTestSkipped(<<<'MESSAGE'
+No privilege to create symlinks. Run test as Administrator (elevated process).
+MESSAGE
+);
+      }
+      throw $e;
+    }
+  }
+
 }
+
+define('WIN_ERROR_PRIVILEGE_NOT_HELD', '1314');
