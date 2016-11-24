@@ -90,7 +90,7 @@ class DrupalFinderTest extends PHPUnit_Framework_TestCase {
     $this->assertFalse($this->finder->getComposerRoot());
   }
 
-  public function testWithRealFilesystem() {
+  public function testDrupalDefaultStructureWithRealFilesystem() {
     $root = $this->tempdir(sys_get_temp_dir());
     $this->dumpToFileSystem(static::$fileStructure, $root);
 
