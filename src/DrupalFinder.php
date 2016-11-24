@@ -19,7 +19,7 @@ class DrupalFinder {
   /**
    * Drupal package composer directory.
    *
-   * @var string
+   * @var boolean
    */
   private $composerRoot;
 
@@ -33,8 +33,8 @@ class DrupalFinder {
         $path = realpath($path);
       }
       // Check the start path.
-      if ($checked_path = $this->isValidRoot($path)) {
-        return $checked_path;
+      if ($this->isValidRoot($path)) {
+        return TRUE;
       }
       else {
         // Move up dir by dir and check each.
@@ -42,8 +42,8 @@ class DrupalFinder {
           if ($follow_symlinks && is_link($path)) {
             $path = realpath($path);
           }
-          if ($checked_path = $this->isValidRoot($path)) {
-            return $checked_path;
+          if ($this->isValidRoot($path)) {
+            return TRUE;
           }
         }
       }
@@ -69,7 +69,7 @@ class DrupalFinder {
   /**
    * @param $path
    *
-   * @return string|FALSE
+   * @return boolean
    */
   protected function isValidRoot($path) {
     if (!empty($path) && is_dir($path) && file_exists($path . '/autoload.php') && file_exists($path . '/composer.json')) {
