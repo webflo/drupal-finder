@@ -144,7 +144,20 @@ class DrupalFinderTest extends PHPUnit_Framework_TestCase {
       $path = $dir . $prefix . mt_rand(0, 9999999);
     }
     while (!mkdir($path, $mode));
+    register_shutdown_function(['DrupalFinderTest', 'tempdir_remove'], $path);
     return realpath($path);
+  }
+
+  static function tempdir_remove($path) {
+    $scandir = is_link($path) ? [] : scandir($path);
+    foreach ($scandir as $child) {
+      if (in_array($child, ['.', '..'])) {
+        continue;
+      }
+      $child = "$path/$child";
+      is_dir($child) ? static::tempdir_remove($child) : unlink($child);
+    }
+    rmdir($path);
   }
 
 }
