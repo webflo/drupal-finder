@@ -23,6 +23,29 @@ class DrupalFinderTest extends PHPUnit_Framework_TestCase {
     ],
   ];
 
+  /**
+   * @return array
+   */
+  protected function getDrupalComposerStructure() {
+    $fileStructure = [
+      'web' => static::$fileStructure,
+      'composer.json' => json_encode([
+        'require' => [
+          'drupal/core' => '*'
+        ],
+        'extra' => [
+          'installer-paths' => [
+            'web/core' => [
+              'type:drupal-core'
+            ],
+          ],
+        ],
+      ])
+    ];
+    unset($fileStructure['web']['composer.json']);
+    return $fileStructure;
+  }
+
   protected function setUp() {
     parent::setUp();
     $this->finder = new \DrupalFinder\DrupalFinder();
@@ -46,22 +69,7 @@ class DrupalFinderTest extends PHPUnit_Framework_TestCase {
   }
 
   public function testDrupalComposerStructure() {
-    $fileStructure = [
-      'web' => static::$fileStructure,
-      'composer.json' => json_encode([
-        'require' => [
-          'drupal/core' => '*'
-        ],
-        'extra' => [
-          'installer-paths' => [
-            'web/core' => [
-              'type:drupal-core'
-            ],
-          ],
-        ],
-      ])
-    ];
-    unset($fileStructure['web']['composer.json']);
+    $fileStructure = $this->getDrupalComposerStructure();
 
     $root = vfsStream::setup('root', null, $fileStructure);
     $this->assertTrue($this->finder->locateRoot($root->url() . '/web'));
@@ -80,6 +88,68 @@ class DrupalFinderTest extends PHPUnit_Framework_TestCase {
     $this->assertFalse($this->finder->locateRoot($root->url()));
     $this->assertFalse($this->finder->getDrupalRoot());
     $this->assertFalse($this->finder->getComposerRoot());
+  }
+
+  public function testDrupalDefaultStructureWithRealFilesystem() {
+    $root = $this->tempdir(sys_get_temp_dir());
+    $this->dumpToFileSystem(static::$fileStructure, $root);
+
+    $this->assertTrue($this->finder->locateRoot($root));
+    $this->assertSame($root, $this->finder->getDrupalRoot());
+    $this->assertSame($root, $this->finder->getComposerRoot());
+  }
+
+  public function testDrupalComposerStructureWithRealFilesystem() {
+    $root = $this->tempdir(sys_get_temp_dir());
+    $this->dumpToFileSystem($this->getDrupalComposerStructure(), $root);
+
+    $this->assertTrue($this->finder->locateRoot($root));
+    $this->assertSame($root . '/web', $this->finder->getDrupalRoot());
+    $this->assertSame($root, $this->finder->getComposerRoot());
+  }
+
+  public function testDrupalComposerStructureWithSymlink() {
+    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+      $this->markTestSkipped('Symlinks are not supported by Windows');
+    }
+
+    $root = $this->tempdir(sys_get_temp_dir());
+    $this->dumpToFileSystem($this->getDrupalComposerStructure(), $root);
+
+    $this->assertTrue($this->finder->locateRoot($root));
+    $this->assertSame($root . '/web', $this->finder->getDrupalRoot());
+    $this->assertSame($root, $this->finder->getComposerRoot());
+
+    // Test symlink implementation
+    $symlink = $this->tempdir(sys_get_temp_dir());
+    symlink($root, $symlink . '/foo');
+
+    $this->assertTrue($this->finder->locateRoot($symlink . '/foo'));
+    $this->assertSame(realpath($root . '/web'), $this->finder->getDrupalRoot());
+    $this->assertSame(realpath($root), $this->finder->getComposerRoot());
+  }
+
+  protected function dumpToFileSystem($fileStructure, $root) {
+    foreach ($fileStructure as $name => $content) {
+      if (is_array($content)) {
+        mkdir($root . '/' . $name);
+        $this->dumpToFileSystem($content, $root . '/' . $name);
+      }
+      else {
+        file_put_contents($root . '/' . $name, $content);
+      }
+    }
+  }
+
+  protected function tempdir($dir, $prefix = '', $mode = 0700) {
+    if (substr($dir, -1) != '/') {
+      $dir .= '/';
+    }
+    do {
+      $path = $dir . $prefix . mt_rand(0, 9999999);
+    }
+    while (!mkdir($path, $mode));
+    return $path;
   }
 
 }

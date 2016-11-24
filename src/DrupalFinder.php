@@ -7,6 +7,8 @@
 
 namespace DrupalFinder;
 
+use SplFileInfo;
+
 class DrupalFinder {
 
   /**
@@ -28,53 +30,26 @@ class DrupalFinder {
     $this->composerRoot = FALSE;
 
     foreach (array(TRUE, FALSE) as $follow_symlinks) {
-      $path = $start_path;
-      if ($follow_symlinks && is_link($path)) {
-        $path = realpath($path);
-      }
-      // Check the start path.
-      if ($checked_path = $this->isValidRoot($path)) {
-        return $checked_path;
-      }
-      else {
-        // Move up dir by dir and check each.
-        while ($path = $this->shiftPathUp($path)) {
-          if ($follow_symlinks && is_link($path)) {
-            $path = realpath($path);
-          }
-          if ($checked_path = $this->isValidRoot($path)) {
-            return $checked_path;
-          }
+      $path = new SplFileInfo($start_path);
+      do {
+        if ($follow_symlinks && $path->isLink()) {
+          $path = new SplFileInfo($path->getRealPath());
+        }
+        // Check the start path.
+        if ($this->isValidRoot($path->getPathname())) {
+          return TRUE;
         }
       }
+      while (($path = $path->getPathInfo()) && ($path->getFilename() != '.'));
     }
 
     return FALSE;
   }
 
   /**
-   * Returns parent directory.
-   *
-   * @param string
-   *   Path to start from.
-   *
-   * @return string
-   *   Parent path of given path.
-   */
-  public function shiftPathUp($path) {
-    if (empty($path)) {
-      return FALSE;
-    }
-    $path = explode(DIRECTORY_SEPARATOR, $path);
-    // Move one directory up.
-    array_pop($path);
-    return implode(DIRECTORY_SEPARATOR, $path);
-  }
-
-  /**
    * @param $path
    *
-   * @return string|FALSE
+   * @return bool
    */
   protected function isValidRoot($path) {
     if (!empty($path) && is_dir($path) && file_exists($path . '/autoload.php') && file_exists($path . '/composer.json')) {
