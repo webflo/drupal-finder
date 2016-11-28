@@ -91,10 +91,10 @@ class DrupalFinder
                 file_get_contents($path . '/composer.json'),
                 true
             );
-            if (is_array($json) && isset($json['require']['drupal/core'])) {
+            if (is_array($json)) {
                 if (isset($json['extra']['installer-paths']) && is_array($json['extra']['installer-paths'])) {
                     foreach ($json['extra']['installer-paths'] as $install_path => $items) {
-                        if (in_array('type:drupal-core', $items)) {
+                        if (in_array('type:drupal-core', $items) || in_array('drupal/core', $items)) {
                             $this->composerRoot = $path;
                             $this->drupalRoot = $path . '/' . substr(
                                 $install_path,

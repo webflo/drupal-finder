@@ -83,28 +83,25 @@ class DrupalFinderTest extends PHPUnit_Framework_TestCase
     public function testDrupalComposerStructure()
     {
         $fileStructure = $this->getDrupalComposerStructure();
+        $this->assertComposerStructure($fileStructure);
+    }
 
-        $root = vfsStream::setup('root', null, $fileStructure);
-        $this->assertTrue($this->finder->locateRoot($root->url() . '/web'));
-        $this->assertSame('vfs://root/web', $this->finder->getDrupalRoot());
-        $this->assertSame('vfs://root', $this->finder->getComposerRoot());
-
-        $this->assertTrue($this->finder->locateRoot($root->url() . '/web/misc'));
-        $this->assertSame('vfs://root/web', $this->finder->getDrupalRoot());
-        $this->assertSame('vfs://root', $this->finder->getComposerRoot());
-
-        $this->assertTrue($this->finder->locateRoot($root->url()));
-        $this->assertSame('vfs://root/web', $this->finder->getDrupalRoot());
-        $this->assertSame('vfs://root', $this->finder->getComposerRoot());
-
-        $root = vfsStream::setup(
-            'root',
-            null,
-            ['nested_folder' => $fileStructure]
-        );
-        $this->assertFalse($this->finder->locateRoot($root->url()));
-        $this->assertFalse($this->finder->getDrupalRoot());
-        $this->assertFalse($this->finder->getComposerRoot());
+    public function testDrupalComposerStructureWithoutRequire()
+    {
+        $fileStructure = [
+          'web' => static::$fileStructure,
+          'composer.json' => json_encode([
+            'extra' => [
+              'installer-paths' => [
+                'web/core' => [
+                  'drupal/core',
+                ],
+              ],
+            ],
+          ]),
+        ];
+        unset($fileStructure['web']['composer.json']);
+        $this->assertComposerStructure($fileStructure);
     }
 
     public function testNoDrupalRootWithRealFilesystem()
@@ -237,6 +234,34 @@ MESSAGE
             }
             throw $e;
         }
+    }
+
+    /**
+     * @param $fileStructure
+     */
+    protected function assertComposerStructure($fileStructure)
+    {
+        $root = vfsStream::setup('root', null, $fileStructure);
+        $this->assertTrue($this->finder->locateRoot($root->url() . '/web'));
+        $this->assertSame('vfs://root/web', $this->finder->getDrupalRoot());
+        $this->assertSame('vfs://root', $this->finder->getComposerRoot());
+
+        $this->assertTrue($this->finder->locateRoot($root->url() . '/web/misc'));
+        $this->assertSame('vfs://root/web', $this->finder->getDrupalRoot());
+        $this->assertSame('vfs://root', $this->finder->getComposerRoot());
+
+        $this->assertTrue($this->finder->locateRoot($root->url()));
+        $this->assertSame('vfs://root/web', $this->finder->getDrupalRoot());
+        $this->assertSame('vfs://root', $this->finder->getComposerRoot());
+
+        $root = vfsStream::setup(
+          'root',
+          null,
+          ['nested_folder' => $fileStructure]
+        );
+        $this->assertFalse($this->finder->locateRoot($root->url()));
+        $this->assertFalse($this->finder->getDrupalRoot());
+        $this->assertFalse($this->finder->getComposerRoot());
     }
 }
 
