@@ -4,50 +4,50 @@ use org\bovigo\vfs\vfsStream;
 
 class DrupalFinderTest extends PHPUnit_Framework_TestCase
 {
-
-  /**
-   * @var \DrupalFinder\DrupalFinder
-   */
-  protected $finder;
+    /**
+     * @var \DrupalFinder\DrupalFinder
+     */
+    protected $finder;
 
     protected static $fileStructure = [
-    'autoload.php' => '',
-    'composer.json' => '',
-    'core' => [
-      'includes' => [
-        'common.inc' => '',
-      ],
-      'misc' => [
-        'drupal.js' => '',
-      ],
-      'core.services.yml' => '',
-    ],
-    'modules' => [],
-  ];
-
-  /**
-   * @return array
-   */
-  protected function getDrupalComposerStructure()
-  {
-      $fileStructure = [
-      'web' => static::$fileStructure,
-      'composer.json' => json_encode([
-        'require' => [
-          'drupal/core' => '*'
+      'autoload.php' => '',
+      'composer.json' => '',
+      'core' => [
+        'includes' => [
+          'common.inc' => '',
         ],
-        'extra' => [
-          'installer-paths' => [
-            'web/core' => [
-              'type:drupal-core'
-            ],
-          ],
+        'misc' => [
+          'drupal.js' => '',
         ],
-      ])
+        'core.services.yml' => '',
+      ],
+      'modules' => [],
     ];
-      unset($fileStructure['web']['composer.json']);
-      return $fileStructure;
-  }
+
+    /**
+     * @return array
+     */
+    protected function getDrupalComposerStructure()
+    {
+        $fileStructure = [
+          'web' => static::$fileStructure,
+          'composer.json' => json_encode([
+            'require' => [
+              'drupal/core' => '*',
+            ],
+            'extra' => [
+              'installer-paths' => [
+                'web/core' => [
+                  'type:drupal-core',
+                ],
+              ],
+            ],
+          ]),
+        ];
+        unset($fileStructure['web']['composer.json']);
+
+        return $fileStructure;
+    }
 
     protected function setUp()
     {
@@ -67,8 +67,15 @@ class DrupalFinderTest extends PHPUnit_Framework_TestCase
         $this->assertSame('vfs://root', $this->finder->getDrupalRoot());
         $this->assertSame('vfs://root', $this->finder->getComposerRoot());
 
-        $root = vfsStream::setup('root', null, ['project' => static::$fileStructure]);
-        $this->assertFalse($this->finder->locateRoot($root->url()), 'Not in the scope of the project');
+        $root = vfsStream::setup(
+            'root',
+            null,
+            ['project' => static::$fileStructure]
+        );
+        $this->assertFalse(
+            $this->finder->locateRoot($root->url()),
+            'Not in the scope of the project'
+        );
         $this->assertFalse($this->finder->getDrupalRoot());
         $this->assertFalse($this->finder->getComposerRoot());
     }
@@ -90,7 +97,11 @@ class DrupalFinderTest extends PHPUnit_Framework_TestCase
         $this->assertSame('vfs://root/web', $this->finder->getDrupalRoot());
         $this->assertSame('vfs://root', $this->finder->getComposerRoot());
 
-        $root = vfsStream::setup('root', null, ['nested_folder' => $fileStructure]);
+        $root = vfsStream::setup(
+            'root',
+            null,
+            ['nested_folder' => $fileStructure]
+        );
         $this->assertFalse($this->finder->locateRoot($root->url()));
         $this->assertFalse($this->finder->getDrupalRoot());
         $this->assertFalse($this->finder->getComposerRoot());
@@ -114,8 +125,8 @@ class DrupalFinderTest extends PHPUnit_Framework_TestCase
         $this->assertSame($root, $this->finder->getDrupalRoot());
         $this->assertSame($root, $this->finder->getComposerRoot());
 
-    // Test symlink implementation
-    $symlink = $this->tempdir(sys_get_temp_dir());
+        // Test symlink implementation
+        $symlink = $this->tempdir(sys_get_temp_dir());
         $this->symlink($root, $symlink . '/foo');
 
         $this->assertTrue($this->finder->locateRoot($symlink . '/foo'));
@@ -132,8 +143,8 @@ class DrupalFinderTest extends PHPUnit_Framework_TestCase
         $this->assertSame($root . '/web', $this->finder->getDrupalRoot());
         $this->assertSame($root, $this->finder->getComposerRoot());
 
-    // Test symlink implementation
-    $symlink = $this->tempdir(sys_get_temp_dir());
+        // Test symlink implementation
+        $symlink = $this->tempdir(sys_get_temp_dir());
         $this->symlink($root, $symlink . '/foo');
 
         $this->assertTrue($this->finder->locateRoot($symlink . '/foo'));
@@ -175,7 +186,11 @@ class DrupalFinderTest extends PHPUnit_Framework_TestCase
         do {
             $path = $dir . $prefix . mt_rand(0, 9999999);
         } while (!mkdir($path, $mode));
-        register_shutdown_function(['DrupalFinderTest', 'tempdir_remove'], $path);
+        register_shutdown_function(
+            ['DrupalFinderTest', 'tempdir_remove'],
+            $path
+        );
+
         return realpath($path);
     }
 
@@ -187,6 +202,7 @@ class DrupalFinderTest extends PHPUnit_Framework_TestCase
             } else {
                 unlink($path);
             }
+
             return;
         }
 
@@ -200,31 +216,28 @@ class DrupalFinderTest extends PHPUnit_Framework_TestCase
         rmdir($path);
     }
 
-
-  /**
-   * @param $target
-   * @param $link
-   *
-   * @throws PHPUnit_Framework_SkippedTestError
-   *
-   */
-  private function symlink($target, $link)
-  {
-      try {
-          return symlink($target, $link);
-      } catch (Exception $e) {
-          if (
-        defined('PHP_WINDOWS_VERSION_BUILD')
-        && strstr($e->getMessage(), WIN_ERROR_PRIVILEGE_NOT_HELD)
-      ) {
-              $this->markTestSkipped(<<<'MESSAGE'
+    /**
+     * @param $target
+     * @param $link
+     *
+     * @throws PHPUnit_Framework_SkippedTestError
+     */
+    private function symlink($target, $link)
+    {
+        try {
+            return symlink($target, $link);
+        } catch (Exception $e) {
+            if (defined('PHP_WINDOWS_VERSION_BUILD')
+              && strstr($e->getMessage(), WIN_ERROR_PRIVILEGE_NOT_HELD)
+            ) {
+                $this->markTestSkipped(<<<'MESSAGE'
 No privilege to create symlinks. Run test as Administrator (elevated process).
 MESSAGE
-);
-          }
-          throw $e;
-      }
-  }
+                );
+            }
+            throw $e;
+        }
+    }
 }
 
 define('WIN_ERROR_PRIVILEGE_NOT_HELD', '1314');
