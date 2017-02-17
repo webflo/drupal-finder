@@ -81,8 +81,11 @@ class DrupalFinder
             $candidate = 'core/includes/common.inc';
             if (file_exists($path . '/' . $candidate) && file_exists($path . '/core/core.services.yml')) {
                 if (file_exists($path . '/core/misc/drupal.js') || file_exists($path . '/core/assets/js/drupal.js')) {
-                    $this->composerRoot = $path;
-                    $this->drupalRoot = $path;
+                    // A valid composer root has a vendor directory in it.
+                    if (is_dir($path . '/vendor')) {
+                        $this->composerRoot = $path;
+                        $this->drupalRoot = $path;
+                    }
                 }
             }
         }
