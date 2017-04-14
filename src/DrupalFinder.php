@@ -36,6 +36,7 @@ class DrupalFinder
     {
         $this->drupalRoot = false;
         $this->composerRoot = false;
+        $this->vendorDir = false;
 
         foreach (array(true, false) as $follow_symlinks) {
             $path = $start_path;
@@ -92,6 +93,7 @@ class DrupalFinder
                 if (file_exists($path . '/core/misc/drupal.js') || file_exists($path . '/core/assets/js/drupal.js')) {
                     $this->composerRoot = $path;
                     $this->drupalRoot = $path;
+                    $this->vendorDir = $this->composerRoot . '/vendor';
                 }
             }
         }
@@ -110,13 +112,13 @@ class DrupalFinder
                                 0,
                                 -5
                             );
+                            $this->vendorDir = $this->composerRoot . '/vendor';
                         }
                     }
                 }
             }
         }
         if ($this->composerRoot && file_exists($this->composerRoot . '/composer.json')) {
-            $this->vendorDir = $this->composerRoot . '/vendor';
             $json = json_decode(
                 file_get_contents($path . '/composer.json'),
                 true
