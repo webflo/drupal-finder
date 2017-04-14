@@ -152,5 +152,4 @@ class DrupalFinder
     {
         return $this->vendorDir;
     }
-
 }
