@@ -23,6 +23,15 @@ class DrupalFinder
      */
     private $composerRoot;
 
+    /**
+     * Composer vendor directory.
+     *
+     * @var string
+     *
+     * @see https://getcomposer.org/doc/06-config.md#vendor-dir
+     */
+    private $vendorDir;
+
     public function locateRoot($start_path)
     {
         $this->drupalRoot = false;
@@ -106,8 +115,18 @@ class DrupalFinder
                 }
             }
         }
+        if ($this->composerRoot && file_exists($this->composerRoot . '/composer.json')) {
+            $this->vendorDir = $this->composerRoot . '/vendor';
+            $json = json_decode(
+                file_get_contents($path . '/composer.json'),
+                true
+            );
+            if (is_array($json) && isset($json['config']['vendor-dir'])) {
+                $this->vendorDir = $this->composerRoot . '/' . $json['config']['vendor-dir'];
+            }
+        }
 
-        return $this->drupalRoot && $this->composerRoot;
+        return $this->drupalRoot && $this->composerRoot && $this->vendorDir;
     }
 
     /**
@@ -125,4 +144,13 @@ class DrupalFinder
     {
         return $this->composerRoot;
     }
+
+    /**
+     * @return string
+     */
+    public function getVendorDir()
+    {
+        return $this->vendorDir;
+    }
+
 }
