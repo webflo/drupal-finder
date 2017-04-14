@@ -175,7 +175,8 @@ class DrupalFinderTest extends PHPUnit_Framework_TestCase
         $this->assertSame($root . '/vendor', realpath($this->finder->getVendorDir()));
     }
 
-    public function testDrupalWithCustomVendor() {
+    public function testDrupalWithCustomVendor()
+    {
         $root = $this->tempdir(sys_get_temp_dir());
         $fileStructure = static::$fileStructure;
         $fileStructure['composer.json'] = json_encode([
