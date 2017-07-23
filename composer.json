@@ -15,6 +15,11 @@
             "src/DrupalFinder.php"
         ]
     },
+    "autoload-dev": {
+        "psr-4": {
+            "DrupalFinder\\Tests\\": "tests/"
+        }
+    },
     "require-dev": {
         "phpunit/phpunit": "^4.8",
         "mikey179/vfsStream": "^1.6"
