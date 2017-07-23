@@ -6,7 +6,6 @@ use org\bovigo\vfs\vfsStream;
 
 class Drupal8FinderTest extends DrupalFinderTestBase
 {
-
     protected static $fileStructure = [
       'autoload.php' => '',
       'composer.json' => '',

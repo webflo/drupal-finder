@@ -91,7 +91,6 @@ MESSAGE
             throw $e;
         }
     }
-
 }
 
 define('WIN_ERROR_PRIVILEGE_NOT_HELD', '1314');
