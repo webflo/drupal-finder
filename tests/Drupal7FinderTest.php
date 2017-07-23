@@ -121,7 +121,7 @@ class Drupal7FinderTest extends DrupalFinderTestBase
     {
         $root = $this->tempdir(sys_get_temp_dir());
         $fileStructure = $this->getDrupalComposerStructure();
-        $composerJson = json_decode($fileStructure['composer.json'], TRUE);
+        $composerJson = json_decode($fileStructure['composer.json'], true);
         $composerJson['config']['vendor-dir'] = 'vendor-foo';
         $fileStructure['composer.json'] = json_encode($composerJson, JSON_UNESCAPED_SLASHES);
         $fileStructure['vendor-foo'] = [];
