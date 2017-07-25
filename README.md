@@ -18,7 +18,7 @@ if ($drupalFinder->locateRoot(getcwd())) {
 ## Examples
 
 - [Drupal Console Launcher](https://github.com/hechoendrupal/drupal-console-launcher/blob/master/bin/drupal.php)
-- [Drush Shim](https://github.com/webflo/drush-shim) (with webflo/drupal-finder:^0.0.1)
+- [Drush Shim](https://github.com/webflo/drush-shim) (with webflo/drupal-finder:^0.4.0)
 
 ## License
 
