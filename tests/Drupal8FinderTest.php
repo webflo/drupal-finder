@@ -1,14 +1,11 @@
 <?php
 
+namespace DrupalFinder\Tests;
+
 use org\bovigo\vfs\vfsStream;
 
-class DrupalFinderTest extends PHPUnit_Framework_TestCase
+class Drupal8FinderTest extends DrupalFinderTestBase
 {
-    /**
-     * @var \DrupalFinder\DrupalFinder
-     */
-    protected $finder;
-
     protected static $fileStructure = [
       'autoload.php' => '',
       'composer.json' => '',
@@ -193,79 +190,6 @@ class DrupalFinderTest extends PHPUnit_Framework_TestCase
         $this->assertSame($root . '/vendor-foo', realpath($this->finder->getVendorDir()));
     }
 
-    protected function dumpToFileSystem($fileStructure, $root)
-    {
-        foreach ($fileStructure as $name => $content) {
-            if (is_array($content)) {
-                mkdir($root . '/' . $name);
-                $this->dumpToFileSystem($content, $root . '/' . $name);
-            } else {
-                file_put_contents($root . '/' . $name, $content);
-            }
-        }
-    }
-
-    protected function tempdir($dir, $prefix = '', $mode = 0700)
-    {
-        if (substr($dir, -1) != '/') {
-            $dir .= '/';
-        }
-        do {
-            $path = $dir . $prefix . mt_rand(0, 9999999);
-        } while (!mkdir($path, $mode));
-        register_shutdown_function(
-            ['DrupalFinderTest', 'tempdir_remove'],
-            $path
-        );
-
-        return realpath($path);
-    }
-
-    public static function tempdir_remove($path)
-    {
-        if (is_link($path)) {
-            if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-                rmdir($path);
-            } else {
-                unlink($path);
-            }
-
-            return;
-        }
-
-        foreach (scandir($path) as $child) {
-            if (in_array($child, ['.', '..'])) {
-                continue;
-            }
-            $child = "$path/$child";
-            is_dir($child) ? static::tempdir_remove($child) : unlink($child);
-        }
-        rmdir($path);
-    }
-
-    /**
-     * @param $target
-     * @param $link
-     *
-     * @throws PHPUnit_Framework_SkippedTestError
-     */
-    private function symlink($target, $link)
-    {
-        try {
-            return symlink($target, $link);
-        } catch (Exception $e) {
-            if (defined('PHP_WINDOWS_VERSION_BUILD')
-              && strstr($e->getMessage(), WIN_ERROR_PRIVILEGE_NOT_HELD)
-            ) {
-                $this->markTestSkipped(<<<'MESSAGE'
-No privilege to create symlinks. Run test as Administrator (elevated process).
-MESSAGE
-                );
-            }
-            throw $e;
-        }
-    }
-
     /**
      * @param $fileStructure
      */
@@ -298,5 +222,3 @@ MESSAGE
         $this->assertFalse($this->finder->getVendorDir());
     }
 }
-
-define('WIN_ERROR_PRIVILEGE_NOT_HELD', '1314');

@@ -105,12 +105,11 @@ class DrupalFinder
             if (is_array($json)) {
                 if (isset($json['extra']['installer-paths']) && is_array($json['extra']['installer-paths'])) {
                     foreach ($json['extra']['installer-paths'] as $install_path => $items) {
-                        if (in_array('type:drupal-core', $items) || in_array('drupal/core', $items)) {
+                        if (in_array('type:drupal-core', $items) || in_array('drupal/core', $items) || in_array('drupal/drupal', $items)) {
                             $this->composerRoot = $path;
-                            $this->drupalRoot = $path . '/' . substr(
+                            $this->drupalRoot = $path . '/' . rtrim(
                                 $install_path,
-                                0,
-                                -5
+                                '/core'
                             );
                             $this->vendorDir = $this->composerRoot . '/vendor';
                         }
