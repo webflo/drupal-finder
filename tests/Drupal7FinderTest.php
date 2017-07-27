@@ -32,7 +32,7 @@ class Drupal7FinderTest extends DrupalFinderTestBase
     {
         $fileStructure = [
           'web' => static::$fileStructure,
-          'composer.json' => json_encode([
+          'composer.json' => [
             'require' => [
               'drupal/drupal' => '*',
             ],
@@ -43,7 +43,7 @@ class Drupal7FinderTest extends DrupalFinderTestBase
                 ],
               ],
             ],
-          ]),
+          ],
           'vendor' => [],
         ];
         return $fileStructure;
@@ -59,7 +59,7 @@ class Drupal7FinderTest extends DrupalFinderTestBase
     {
         $fileStructure = [
           'web' => static::$fileStructure,
-          'composer.json' => json_encode([
+          'composer.json' => [
             'extra' => [
               'installer-paths' => [
                 'web' => [
@@ -67,7 +67,7 @@ class Drupal7FinderTest extends DrupalFinderTestBase
                 ],
               ],
             ],
-          ]),
+          ],
         ];
         $this->assertComposerStructure($fileStructure);
     }
@@ -121,9 +121,9 @@ class Drupal7FinderTest extends DrupalFinderTestBase
     {
         $root = $this->tempdir(sys_get_temp_dir());
         $fileStructure = $this->getDrupalComposerStructure();
-        $composerJson = json_decode($fileStructure['composer.json'], true);
+        $composerJson = $fileStructure['composer.json'];
         $composerJson['config']['vendor-dir'] = 'vendor-foo';
-        $fileStructure['composer.json'] = json_encode($composerJson, JSON_UNESCAPED_SLASHES);
+        $fileStructure['composer.json'] = $composerJson;
         $fileStructure['vendor-foo'] = [];
         $this->dumpToFileSystem($fileStructure, $root);
 
@@ -138,6 +138,7 @@ class Drupal7FinderTest extends DrupalFinderTestBase
      */
     protected function assertComposerStructure($fileStructure)
     {
+        $fileStructure = $this->prepareFileStructure($fileStructure);
         $root = vfsStream::setup('root', null, $fileStructure);
         $this->assertTrue($this->finder->locateRoot($root->url() . '/web'));
         $this->assertSame('vfs://root/web', $this->finder->getDrupalRoot());

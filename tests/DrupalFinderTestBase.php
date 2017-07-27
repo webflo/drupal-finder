@@ -21,6 +21,7 @@ abstract class DrupalFinderTestBase extends PHPUnit_Framework_TestCase
 
     protected function dumpToFileSystem($fileStructure, $root)
     {
+        $fileStructure = $this->prepareFileStructure($fileStructure);
         foreach ($fileStructure as $name => $content) {
             if (is_array($content)) {
                 mkdir($root . '/' . $name);
@@ -29,6 +30,19 @@ abstract class DrupalFinderTestBase extends PHPUnit_Framework_TestCase
                 file_put_contents($root . '/' . $name, $content);
             }
         }
+    }
+
+    protected function prepareFileStructure($fileStructure)
+    {
+        foreach ($fileStructure as $name => $content) {
+            if (($name === 'composer.json' || $name === 'composer.lock') && is_array($content)) {
+                $fileStructure[$name] = json_encode($content, JSON_UNESCAPED_SLASHES);
+            }
+            elseif (is_array($content)) {
+                $fileStructure[$name] = $this->prepareFileStructure($content);
+            }
+        }
+        return $fileStructure;
     }
 
     protected function tempdir($dir, $prefix = '', $mode = 0700)
