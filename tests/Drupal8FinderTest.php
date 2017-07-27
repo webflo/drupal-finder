@@ -29,7 +29,7 @@ class Drupal8FinderTest extends DrupalFinderTestBase
     {
         $fileStructure = [
           'web' => static::$fileStructure,
-          'composer.json' => json_encode([
+          'composer.json' => [
             'require' => [
               'drupal/core' => '*',
             ],
@@ -40,7 +40,7 @@ class Drupal8FinderTest extends DrupalFinderTestBase
                 ],
               ],
             ],
-          ]),
+          ],
           'vendor' => [],
         ];
         unset($fileStructure['web']['composer.json']);
@@ -57,7 +57,7 @@ class Drupal8FinderTest extends DrupalFinderTestBase
 
     public function testDrupalDefaultStructure()
     {
-        $root = vfsStream::setup('root', null, static::$fileStructure);
+        $root = vfsStream::setup('root', null, $this->prepareFileStructure(static::$fileStructure));
 
         $this->assertTrue($this->finder->locateRoot($root->url()));
         $this->assertSame('vfs://root', $this->finder->getDrupalRoot());
@@ -72,7 +72,7 @@ class Drupal8FinderTest extends DrupalFinderTestBase
         $root = vfsStream::setup(
             'root',
             null,
-            ['project' => static::$fileStructure]
+            ['project' => $this->prepareFileStructure(static::$fileStructure)]
         );
         $this->assertFalse(
             $this->finder->locateRoot($root->url()),
@@ -89,11 +89,60 @@ class Drupal8FinderTest extends DrupalFinderTestBase
         $this->assertComposerStructure($fileStructure);
     }
 
+    public function testDrupalComposerStructureWithCustomRoot()
+    {
+        $fileStructure = [
+            'src' => static::$fileStructure,
+            'composer.json' => [
+                'require' => [
+                    'drupal/core' => '*',
+                ],
+                'extra' => [
+                    'installer-paths' => [
+                        'src/core' => [
+                            'type:drupal-core',
+                        ],
+                    ],
+                ],
+            ],
+            'vendor' => [],
+        ];
+        unset($fileStructure['src']['composer.json']);
+        unset($fileStructure['src']['vendor']);
+
+        $fileStructure = $this->prepareFileStructure($fileStructure);
+        $root = vfsStream::setup('root', null, $fileStructure);
+        $this->assertTrue($this->finder->locateRoot($root->url() . '/src'));
+        $this->assertSame('vfs://root/src', $this->finder->getDrupalRoot());
+        $this->assertSame('vfs://root', $this->finder->getComposerRoot());
+        $this->assertSame('vfs://root/vendor', $this->finder->getVendorDir());
+
+        $this->assertTrue($this->finder->locateRoot($root->url() . '/src/misc'));
+        $this->assertSame('vfs://root/src', $this->finder->getDrupalRoot());
+        $this->assertSame('vfs://root', $this->finder->getComposerRoot());
+        $this->assertSame('vfs://root/vendor', $this->finder->getVendorDir());
+
+        $this->assertTrue($this->finder->locateRoot($root->url()));
+        $this->assertSame('vfs://root/src', $this->finder->getDrupalRoot());
+        $this->assertSame('vfs://root', $this->finder->getComposerRoot());
+        $this->assertSame('vfs://root/vendor', $this->finder->getVendorDir());
+
+        $root = vfsStream::setup(
+            'root',
+            null,
+            ['nested_folder' => $fileStructure]
+        );
+        $this->assertFalse($this->finder->locateRoot($root->url()));
+        $this->assertFalse($this->finder->getDrupalRoot());
+        $this->assertFalse($this->finder->getComposerRoot());
+        $this->assertFalse($this->finder->getVendorDir());
+    }
+
     public function testDrupalComposerStructureWithoutRequire()
     {
         $fileStructure = [
           'web' => static::$fileStructure,
-          'composer.json' => json_encode([
+          'composer.json' => [
             'extra' => [
               'installer-paths' => [
                 'web/core' => [
@@ -101,7 +150,7 @@ class Drupal8FinderTest extends DrupalFinderTestBase
                 ],
               ],
             ],
-          ]),
+          ],
         ];
         unset($fileStructure['web']['composer.json']);
         $this->assertComposerStructure($fileStructure);
@@ -176,11 +225,11 @@ class Drupal8FinderTest extends DrupalFinderTestBase
     {
         $root = $this->tempdir(sys_get_temp_dir());
         $fileStructure = static::$fileStructure;
-        $fileStructure['composer.json'] = json_encode([
+        $fileStructure['composer.json'] = [
             'config' => [
                 'vendor-dir' => 'vendor-foo'
             ]
-        ], JSON_UNESCAPED_SLASHES);
+        ];
         $fileStructure['vendor-foo'] = [];
         $this->dumpToFileSystem($fileStructure, $root);
 
@@ -195,6 +244,7 @@ class Drupal8FinderTest extends DrupalFinderTestBase
      */
     protected function assertComposerStructure($fileStructure)
     {
+        $fileStructure = $this->prepareFileStructure($fileStructure);
         $root = vfsStream::setup('root', null, $fileStructure);
         $this->assertTrue($this->finder->locateRoot($root->url() . '/web'));
         $this->assertSame('vfs://root/web', $this->finder->getDrupalRoot());
