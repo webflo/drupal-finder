@@ -37,8 +37,7 @@ abstract class DrupalFinderTestBase extends PHPUnit_Framework_TestCase
         foreach ($fileStructure as $name => $content) {
             if (($name === 'composer.json' || $name === 'composer.lock') && is_array($content)) {
                 $fileStructure[$name] = json_encode($content, JSON_UNESCAPED_SLASHES);
-            }
-            elseif (is_array($content)) {
+            } elseif (is_array($content)) {
                 $fileStructure[$name] = $this->prepareFileStructure($content);
             }
         }
