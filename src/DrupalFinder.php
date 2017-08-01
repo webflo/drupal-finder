@@ -105,10 +105,14 @@ class DrupalFinder
             if (is_array($json)) {
                 if (isset($json['extra']['installer-paths']) && is_array($json['extra']['installer-paths'])) {
                     foreach ($json['extra']['installer-paths'] as $install_path => $items) {
-                        if (in_array('type:drupal-core', $items) || in_array('drupal/core', $items) || in_array('drupal/drupal', $items)) {
+                        if (in_array('type:drupal-core', $items) ||
+                            in_array('drupal/core', $items) ||
+                            in_array('drupal/drupal', $items)) {
                             $this->composerRoot = $path;
                             // @todo: Remove this magic and detect the major version instead.
-                            if (substr($install_path, -5) == '/core') {
+                            if ($install_path == 'core') {
+                                $install_path = null;
+                            } elseif (substr($install_path, -5) == '/core') {
                                 $install_path = substr($install_path, 0, -5);
                             }
                             $this->drupalRoot = rtrim($path . '/' . $install_path, '/');
