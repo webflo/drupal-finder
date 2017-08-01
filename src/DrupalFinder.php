@@ -108,7 +108,10 @@ class DrupalFinder
                         if (in_array('type:drupal-core', $items) || in_array('drupal/core', $items) || in_array('drupal/drupal', $items)) {
                             $this->composerRoot = $path;
                             // @todo: Remove this magic and detect the major version instead.
-                            if (substr($install_path, -5) == '/core') {
+                            if ($install_path == 'core') {
+                                $install_path = NULL;
+                            }
+                            elseif (substr($install_path, -5) == '/core') {
                                 $install_path = substr($install_path, 0, -5);
                             }
                             $this->drupalRoot = rtrim($path . '/' . $install_path, '/');

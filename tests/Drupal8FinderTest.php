@@ -7,19 +7,27 @@ use org\bovigo\vfs\vfsStream;
 class Drupal8FinderTest extends DrupalFinderTestBase
 {
     protected static $fileStructure = [
-      'autoload.php' => '',
-      'composer.json' => '',
-      'core' => [
-        'includes' => [
-          'common.inc' => '',
+        'autoload.php' => '',
+        'composer.json' => [
+            'extra' => [
+                'installer-paths' => [
+                    'core' => [
+                        'type:drupal-core'
+                    ]
+                ]
+            ]
         ],
-        'misc' => [
-          'drupal.js' => '',
+        'core' => [
+            'includes' => [
+                'common.inc' => '',
+            ],
+            'misc' => [
+                'drupal.js' => '',
+            ],
+            'core.services.yml' => '',
         ],
-        'core.services.yml' => '',
-      ],
-      'modules' => [],
-      'vendor' => [],
+        'modules' => [],
+        'vendor' => [],
     ];
 
     /**
