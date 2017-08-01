@@ -94,7 +94,7 @@ abstract class DrupalFinderTestBase extends PHPUnit_Framework_TestCase
             return symlink($target, $link);
         } catch (Exception $e) {
             if (defined('PHP_WINDOWS_VERSION_BUILD')
-              && strstr($e->getMessage(), WIN_ERROR_PRIVILEGE_NOT_HELD)
+                && strstr($e->getMessage(), WIN_ERROR_PRIVILEGE_NOT_HELD)
             ) {
                 $this->markTestSkipped(<<<'MESSAGE'
 No privilege to create symlinks. Run test as Administrator (elevated process).

@@ -36,20 +36,20 @@ class Drupal8FinderTest extends DrupalFinderTestBase
     protected function getDrupalComposerStructure()
     {
         $fileStructure = [
-          'web' => static::$fileStructure,
-          'composer.json' => [
-            'require' => [
-              'drupal/core' => '*',
-            ],
-            'extra' => [
-              'installer-paths' => [
-                'web/core' => [
-                  'type:drupal-core',
+            'web' => static::$fileStructure,
+            'composer.json' => [
+                'require' => [
+                    'drupal/core' => '*',
                 ],
-              ],
+                'extra' => [
+                    'installer-paths' => [
+                        'web/core' => [
+                            'type:drupal-core',
+                        ],
+                    ],
+                ],
             ],
-          ],
-          'vendor' => [],
+            'vendor' => [],
         ];
         unset($fileStructure['web']['composer.json']);
         unset($fileStructure['web']['vendor']);
@@ -149,16 +149,16 @@ class Drupal8FinderTest extends DrupalFinderTestBase
     public function testDrupalComposerStructureWithoutRequire()
     {
         $fileStructure = [
-          'web' => static::$fileStructure,
-          'composer.json' => [
-            'extra' => [
-              'installer-paths' => [
-                'web/core' => [
-                  'drupal/core',
+            'web' => static::$fileStructure,
+            'composer.json' => [
+                'extra' => [
+                    'installer-paths' => [
+                        'web/core' => [
+                            'drupal/core',
+                        ],
+                    ],
                 ],
-              ],
             ],
-          ],
         ];
         unset($fileStructure['web']['composer.json']);
         $this->assertComposerStructure($fileStructure);
@@ -270,9 +270,9 @@ class Drupal8FinderTest extends DrupalFinderTestBase
         $this->assertSame('vfs://root/vendor', $this->finder->getVendorDir());
 
         $root = vfsStream::setup(
-          'root',
-          null,
-          ['nested_folder' => $fileStructure]
+            'root',
+            null,
+            ['nested_folder' => $fileStructure]
         );
         $this->assertFalse($this->finder->locateRoot($root->url()));
         $this->assertFalse($this->finder->getDrupalRoot());

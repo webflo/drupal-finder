@@ -12,17 +12,17 @@ class Drupal7FinderTest extends DrupalFinderTestBase
     protected $finder;
 
     protected static $fileStructure = [
-      'includes' => [
-        'common.inc' => '',
-      ],
-      'misc' => [
-        'drupal.js' => '',
-      ],
-      'sites' => [
-        'all' => [
-          'modules' => []
+        'includes' => [
+            'common.inc' => '',
+        ],
+        'misc' => [
+            'drupal.js' => '',
+        ],
+        'sites' => [
+            'all' => [
+                'modules' => []
+            ]
         ]
-      ]
     ];
 
     /**
@@ -31,20 +31,20 @@ class Drupal7FinderTest extends DrupalFinderTestBase
     protected function getDrupalComposerStructure()
     {
         $fileStructure = [
-          'web' => static::$fileStructure,
-          'composer.json' => [
-            'require' => [
-              'drupal/drupal' => '*',
-            ],
-            'extra' => [
-              'installer-paths' => [
-                'web/' => [
-                  'type:drupal-core',
+            'web' => static::$fileStructure,
+            'composer.json' => [
+                'require' => [
+                    'drupal/drupal' => '*',
                 ],
-              ],
+                'extra' => [
+                    'installer-paths' => [
+                        'web/' => [
+                            'type:drupal-core',
+                        ],
+                    ],
+                ],
             ],
-          ],
-          'vendor' => [],
+            'vendor' => [],
         ];
         return $fileStructure;
     }
@@ -58,16 +58,16 @@ class Drupal7FinderTest extends DrupalFinderTestBase
     public function testDrupalComposerStructureWithoutRequire()
     {
         $fileStructure = [
-          'web' => static::$fileStructure,
-          'composer.json' => [
-            'extra' => [
-              'installer-paths' => [
-                'web' => [
-                  'drupal/drupal',
+            'web' => static::$fileStructure,
+            'composer.json' => [
+                'extra' => [
+                    'installer-paths' => [
+                        'web' => [
+                            'drupal/drupal',
+                        ],
+                    ],
                 ],
-              ],
             ],
-          ],
         ];
         $this->assertComposerStructure($fileStructure);
     }
@@ -156,9 +156,9 @@ class Drupal7FinderTest extends DrupalFinderTestBase
         $this->assertSame('vfs://root/vendor', $this->finder->getVendorDir());
 
         $root = vfsStream::setup(
-          'root',
-          null,
-          ['nested_folder' => $fileStructure]
+            'root',
+            null,
+            ['nested_folder' => $fileStructure]
         );
         $this->assertFalse($this->finder->locateRoot($root->url()));
         $this->assertFalse($this->finder->getDrupalRoot());
