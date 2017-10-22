@@ -151,13 +151,13 @@ class DrupalFinder
         return $this->composerRoot;
     }
 
-  /**
-   * @return string
-   */
-  public function getComposerFileName()
-  {
-    return getenv('COMPOSER') ?: 'composer.json';
-  }
+    /**
+     * @return string
+     */
+    protected function getComposerFileName()
+    {
+        return trim(getenv('COMPOSER')) ?: 'composer.json';
+    }
 
     /**
      * @return string
