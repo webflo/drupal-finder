@@ -120,6 +120,12 @@ class DrupalFinder
                         }
                     }
                 }
+                elseif (isset($json['extra']['drupal-composer-helper']) && is_array($json['extra']['drupal-composer-helper'])) {
+                    $web_prefix = isset($json['extra']['drupal-composer-helper']['web-prefix']) ? $json['extra']['drupal-composer-helper']['web-prefix'] : 'web';
+                    $this->composerRoot = $path;
+                    $this->drupalRoot = $path . '/' . $web_prefix;
+                    $this->vendorDir = $path . '/vendor';
+                }
             }
         }
         if ($this->composerRoot && file_exists($this->composerRoot . '/composer.json')) {
