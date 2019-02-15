@@ -247,6 +247,18 @@ class Drupal8FinderTest extends DrupalFinderTestBase
         $this->assertSame($root . '/vendor-foo', realpath($this->finder->getVendorDir()));
     }
 
+    public function testDrupalComposerWithRelativeRoot()
+    {
+        $root = $this->tempdir(sys_get_temp_dir());
+        $fileStructure = ['drupal' => $this->getDrupalComposerStructure()];
+        $this->dumpToFileSystem($fileStructure, $root);
+
+        $cwd = getcwd();
+        chdir($root . '/drupal');
+        $this->assertTrue($this->finder->locateRoot('web'));
+        chdir($cwd);
+    }
+
     /**
      * @param $fileStructure
      */
