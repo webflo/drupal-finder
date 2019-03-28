@@ -215,17 +215,17 @@ class Drupal8FinderTest extends DrupalFinderTestBase
     }
 
     public function testDrupalDefaultStructureWithRealFilesystemInSubdirectory() {
-      $root = $this->tempdir(sys_get_temp_dir()) . '/subdir';
-      mkdir($root);
-      mkdir($root . '/htdocs');
-      $this->dumpToFileSystem(static::$fileStructure, $root . '/htdocs');
+        $root = $this->tempdir(sys_get_temp_dir()) . '/subdir';
+        mkdir($root);
+        mkdir($root . '/htdocs');
+        $this->dumpToFileSystem(static::$fileStructure, $root . '/htdocs');
 
-      $symlink = $this->tempdir(sys_get_temp_dir());
-      $this->symlink($root, $symlink . '/foo');
+        $symlink = $this->tempdir(sys_get_temp_dir());
+        $this->symlink($root, $symlink . '/foo');
 
-      $this->finder->locateRoot($symlink . '/foo/htdocs');
+        $this->finder->locateRoot($symlink . '/foo/htdocs');
 
-      $this->assertSame($root, $this->finder->getDrupalRoot());
+        $this->assertSame($root, $this->finder->getDrupalRoot());
     }
 
     public function testDrupalWithLinkedModule()
