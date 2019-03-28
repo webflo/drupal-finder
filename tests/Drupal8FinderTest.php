@@ -214,7 +214,8 @@ class Drupal8FinderTest extends DrupalFinderTestBase
         $this->assertSame($root . '/vendor', $this->finder->getVendorDir());
     }
 
-    public function testDrupalDefaultStructureWithRealFilesystemInSubdirectory() {
+    public function testDrupalDefaultStructureWithRealFilesystemInSubdirectory() 
+    {
         $root = $this->tempdir(sys_get_temp_dir()) . '/subdir';
         mkdir($root);
         mkdir($root . '/htdocs');
