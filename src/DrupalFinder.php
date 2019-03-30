@@ -102,6 +102,11 @@ class DrupalFinder
                 file_get_contents($path . '/' . $this->getComposerFileName()),
                 true
             );
+
+            if (is_null($json)) {
+                throw new \Exception('Unable to decode ' . $path . '/' . $this->getComposerFileName());
+            }
+
             if (is_array($json)) {
                 if (isset($json['extra']['installer-paths']) && is_array($json['extra']['installer-paths'])) {
                     foreach ($json['extra']['installer-paths'] as $install_path => $items) {
