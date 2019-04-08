@@ -9,7 +9,9 @@
             "email": "florian@webflo.org"
         }
     ],
-    "require": {},
+    "require": {
+        "ext-json": "*"
+    },
     "autoload": {
         "classmap": [
             "src/DrupalFinder.php"
