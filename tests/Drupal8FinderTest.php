@@ -216,17 +216,39 @@ class Drupal8FinderTest extends DrupalFinderTestBase
 
     public function testDrupalDefaultStructureWithRealFilesystemInSubdirectory()
     {
-        $root = $this->tempdir(sys_get_temp_dir()) . '/subdir';
-        mkdir($root);
-        mkdir($root . '/htdocs');
-        $this->dumpToFileSystem(static::$fileStructure, $root . '/htdocs');
+        $root = $this->tempdir(sys_get_temp_dir());
+        mkdir($root . '/release');
+        mkdir($root . '/release/1');
+        mkdir($root . '/release/1/htdocs');
+        mkdir($root . '/release/2');
+        mkdir($root . '/release/2/htdocs');
 
-        $symlink = $this->tempdir(sys_get_temp_dir());
-        $this->symlink($root, $symlink . '/foo');
+        $this->dumpToFileSystem(static::$fileStructure, $root . '/release/1/htdocs');
+        $this->dumpToFileSystem(static::$fileStructure, $root . '/release/2/htdocs');
 
-        $this->finder->locateRoot($symlink . '/foo/htdocs');
+        $this->symlink($root . '/release/2', $root . '/current');
 
-        $this->assertSame($root, $this->finder->getDrupalRoot());
+        $this->finder->locateRoot($root . '/current/htdocs');
+        $this->assertSame($root . '/current/htdocs', $this->finder->getDrupalRoot());
+    }
+
+    public function testDrupalComposerStructureWithRealFilesystemInSubdirectory()
+    {
+        $root = $this->tempdir(sys_get_temp_dir());
+        mkdir($root . '/release');
+        mkdir($root . '/release/1');
+        mkdir($root . '/release/2');
+
+        $this->dumpToFileSystem($this->getDrupalComposerStructure(), $root . '/release/1');
+        $this->dumpToFileSystem($this->getDrupalComposerStructure(), $root . '/release/2');
+
+        $this->symlink($root . '/release/2', $root . '/current');
+
+        $this->finder->locateRoot($root . '/current');
+        $this->assertSame($root . '/release/2/web', $this->finder->getDrupalRoot());
+
+        $this->finder->locateRoot($root . '/current/web');
+        $this->assertSame($root . '/release/2/web', $this->finder->getDrupalRoot());
     }
 
     public function testDrupalWithLinkedModule()
