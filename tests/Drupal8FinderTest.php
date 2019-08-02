@@ -30,6 +30,34 @@ class Drupal8FinderTest extends DrupalFinderTestBase
         'vendor' => [],
     ];
 
+    protected static $fileStructureDrupal_8_8_x = [
+        'autoload.php' => '',
+        'composer.json' => [
+            'name' => 'drupal/drupal',
+            'require' => [
+                'drupal/core' => 'self.version',
+            ],
+            'extra' => [
+                'installer-paths' => [
+                    'vendor/drupal/core' => [
+                        'type:drupal-core',
+                    ],
+                ],
+            ],
+        ],
+        'core' => [
+            'includes' => [
+                'common.inc' => '',
+            ],
+            'misc' => [
+                'drupal.js' => '',
+            ],
+            'core.services.yml' => '',
+        ],
+        'modules' => [],
+        'vendor' => [],
+    ];
+
     /**
      * @return array
      */
@@ -85,6 +113,34 @@ class Drupal8FinderTest extends DrupalFinderTestBase
         $this->assertFalse(
             $this->finder->locateRoot($root->url()),
             'Not in the scope of the project'
+        );
+        $this->assertFalse($this->finder->getDrupalRoot());
+        $this->assertFalse($this->finder->getComposerRoot());
+        $this->assertFalse($this->finder->getVendorDir());
+    }
+
+    public function testDrupalDefaultStructure_8_8_x()
+    {
+        $root = vfsStream::setup('root', null, $this->prepareFileStructure(static::$fileStructureDrupal_8_8_x));
+
+        $this->assertTrue($this->finder->locateRoot($root->url()));
+        $this->assertSame('vfs://root', $this->finder->getDrupalRoot());
+        $this->assertSame('vfs://root', $this->finder->getComposerRoot());
+        $this->assertSame('vfs://root/vendor', $this->finder->getVendorDir());
+
+        $this->assertTrue($this->finder->locateRoot($root->url() . '/misc'));
+        $this->assertSame('vfs://root', $this->finder->getDrupalRoot());
+        $this->assertSame('vfs://root', $this->finder->getComposerRoot());
+        $this->assertSame('vfs://root/vendor', $this->finder->getVendorDir());
+
+        $root = vfsStream::setup(
+          'root',
+          null,
+          ['project' => $this->prepareFileStructure(static::$fileStructure)]
+        );
+        $this->assertFalse(
+          $this->finder->locateRoot($root->url()),
+          'Not in the scope of the project'
         );
         $this->assertFalse($this->finder->getDrupalRoot());
         $this->assertFalse($this->finder->getComposerRoot());
