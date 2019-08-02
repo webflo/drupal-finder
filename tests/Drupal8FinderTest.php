@@ -58,7 +58,7 @@ class Drupal8FinderTest extends DrupalFinderTestBase
         'vendor' => [],
     ];
 
-  /**
+    /**
      * @return array
      */
     protected function getDrupalComposerStructure()
