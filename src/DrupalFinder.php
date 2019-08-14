@@ -119,8 +119,8 @@ class DrupalFinder
                             $this->vendorDir = $this->composerRoot . '/vendor';
                         }
                     }
-                } elseif (isset($json['extra']['drupal-composer-helper']) && is_array($json['extra']['drupal-composer-helper'])) {
-                    $web_prefix = isset($json['extra']['drupal-composer-helper']['web-prefix']) ? $json['extra']['drupal-composer-helper']['web-prefix'] : 'web';
+                } elseif (!empty($json['extra']['drupal-web-dir'])) {
+                    $web_prefix = $json['extra']['drupal-web-dir'];
                     $this->composerRoot = $path;
                     $this->drupalRoot = $path . '/' . $web_prefix;
                     $this->vendorDir = $path . '/vendor';
