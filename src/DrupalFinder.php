@@ -75,6 +75,12 @@ class DrupalFinder
     {
         $parent = dirname($path);
 
+        // If $path did not contain any parents, it may be a relative path:
+        // normalize it to the realpath first.
+        if ($parent === '.' && ($realpath = realpath($path))) {
+            $parent = dirname($realpath);
+        }
+
         return in_array($parent, ['.', $path]) ? false : $parent;
     }
 
