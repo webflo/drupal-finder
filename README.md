@@ -15,6 +15,22 @@ if ($drupalFinder->locateRoot(getcwd())) {
 }
 ```
 
+### Environment variables fallback
+
+If normal detection fails (e.g. you do not have a composer.json file), then the
+detection mechanism switches over to looking for explicitly set environment
+variables, which point to the pertinent directory:
+
+- `DRUPAL_FINDER_DRUPAL_ROOT`
+- `DRUPAL_FINDER_COMPOSER_ROOT`
+- `DRUPAL_FINDER_VENDOR_DIR`
+
+For example:
+
+- `DRUPAL_FINDER_DRUPAL_ROOT=/var/www/web`
+- `DRUPAL_FINDER_COMPOSER_ROOT=/var/www`
+- `DRUPAL_FINDER_VENDOR_DIR=/var/www/vendor`
+
 ## Examples
 
 - [Drupal Console Launcher](https://github.com/hechoendrupal/drupal-console-launcher)
