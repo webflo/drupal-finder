@@ -91,6 +91,16 @@ class Drupal8FinderTest extends DrupalFinderTestBase
         $this->finder = new \DrupalFinder\DrupalFinder();
     }
 
+    protected function tearDown()
+    {
+        parent::tearDown();
+        // Unset variables to ensure their values don't carry over into other
+        // tests that are going to run.
+        putenv('DRUPAL_FINDER_DRUPAL_ROOT');
+        putenv('DRUPAL_FINDER_COMPOSER_ROOT');
+        putenv('DRUPAL_FINDER_VENDOR_DIR');
+    }
+
     public function testDrupalDefaultStructure()
     {
         $root = vfsStream::setup('root', null, $this->prepareFileStructure(static::$fileStructure));
@@ -301,6 +311,92 @@ class Drupal8FinderTest extends DrupalFinderTestBase
         $this->assertSame($root, realpath($this->finder->getDrupalRoot()));
         $this->assertSame($root, realpath($this->finder->getComposerRoot()));
         $this->assertSame($root . '/vendor-foo', realpath($this->finder->getVendorDir()));
+    }
+
+    public function testEnvironmentFallbackWithoutComposerJson() {
+
+        $fileStructure = [
+            'web' => [],
+            'vendor' => [
+                'autoload.php'
+            ]
+        ];
+
+        $root = $this->tempdir(sys_get_temp_dir());
+        $this->dumpToFileSystem($fileStructure, $root);
+
+        $drupal_root = $root . '/web';
+        $composer_root = $root . '/';
+        $vendor_dir = $root . '/vendor';
+
+        putenv("DRUPAL_FINDER_DRUPAL_ROOT=$drupal_root");
+        putenv("DRUPAL_FINDER_COMPOSER_ROOT=$composer_root");
+        putenv("DRUPAL_FINDER_VENDOR_DIR=$vendor_dir");
+
+        $this->assertTrue($this->finder->locateRoot($root));
+        $this->assertSame($this->finder->getDrupalRoot(), $drupal_root);
+        $this->assertSame($this->finder->getComposerRoot(), $composer_root);
+        $this->assertSame($this->finder->getVendorDir(), $vendor_dir);
+    }
+
+    public function testEnvironmentFallbackWithoutDrupalVariable() {
+        $fileStructure = [
+            'web' => [],
+            'vendor' => [
+                'autoload.php'
+            ]
+        ];
+
+        $root = $this->tempdir(sys_get_temp_dir());
+        $this->dumpToFileSystem($fileStructure, $root);
+
+        $composer_root = $root . '/';
+        $vendor_dir = $root . '/vendor';
+
+        putenv("DRUPAL_FINDER_COMPOSER_ROOT=$composer_root");
+        putenv("DRUPAL_FINDER_VENDOR_DIR=$vendor_dir");
+
+        $this->assertFalse($this->finder->locateRoot($root));
+    }
+
+    public function testEnvironmentFallbackWithoutComposerVariable() {
+        $fileStructure = [
+            'web' => [],
+            'vendor' => [
+                'autoload.php'
+            ]
+        ];
+
+        $root = $this->tempdir(sys_get_temp_dir());
+        $this->dumpToFileSystem($fileStructure, $root);
+
+        $drupal_root = $root . '/web';
+        $vendor_dir = $root . '/vendor';
+
+        putenv("DRUPAL_FINDER_DRUPAL_ROOT=$drupal_root");
+        putenv("DRUPAL_FINDER_VENDOR_DIR=$vendor_dir");
+
+        $this->assertFalse($this->finder->locateRoot($root));
+    }
+
+    public function testEnvironmentFallbackWithoutVendorVariable() {
+        $fileStructure = [
+            'web' => [],
+            'vendor' => [
+                'autoload.php'
+            ]
+        ];
+
+        $root = $this->tempdir(sys_get_temp_dir());
+        $this->dumpToFileSystem($fileStructure, $root);
+
+        $drupal_root = $root . '/web';
+        $composer_root = $root . '/';
+
+        putenv("DRUPAL_FINDER_DRUPAL_ROOT=$drupal_root");
+        putenv("DRUPAL_FINDER_COMPOSER_ROOT=$composer_root");
+
+        $this->assertFalse($this->finder->locateRoot($root));
     }
 
     /**

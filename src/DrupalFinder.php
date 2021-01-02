@@ -24,6 +24,27 @@ class DrupalFinder
     private $composerRoot;
 
     /**
+     * Drupal root key used when doing env vars check.
+     *
+     * @var string
+     */
+    protected const DRUPAL_ROOT_KEY = 'drupal_root';
+
+    /**
+     * Composer root key used when doing env vars check.
+     *
+     * @var string
+     */
+    protected const COMPOSER_ROOT_KEY = 'composer_root';
+
+    /**
+     * Vendor dir key used when doing env vars check.
+     *
+     * @var string
+     */
+    protected const VENDOR_DIR_KEY = 'vendor_dir';
+
+    /**
      * Composer vendor directory.
      *
      * @var string
@@ -57,6 +78,13 @@ class DrupalFinder
                     }
                 }
             }
+        }
+
+        // If original build logic fails, check if valid environment variables
+        // have been specified which indicate the paths of composer root,
+        // drupal root, and vendor directory.
+        if ($this->validExplicitPaths()) {
+          return true;
         }
 
         return false;
@@ -170,5 +198,39 @@ class DrupalFinder
     public function getVendorDir()
     {
         return $this->vendorDir;
+    }
+
+    /**
+     * Try to extract valid paths from environment variables.
+     *
+     * @return bool
+     *   True if valid fallback environment variables were specified. False otherwise.
+     */
+    protected function validExplicitPaths() {
+        $env_vars = [
+            self::COMPOSER_ROOT_KEY => 'DRUPAL_FINDER_COMPOSER_ROOT',
+            self::DRUPAL_ROOT_KEY => 'DRUPAL_FINDER_DRUPAL_ROOT',
+            self::VENDOR_DIR_KEY => 'DRUPAL_FINDER_VENDOR_DIR',
+        ];
+
+        $paths = [];
+
+        // First, validate that all of the expected environment variables exist,
+        // and that they each point to a valid directory. If even one is not
+        // set, then consider the environment variable fallback to be invalid.
+        foreach ($env_vars as $path_key => $path_var) {
+            $path = getenv($path_var);
+            if (!is_string($path) || !is_dir($path)) {
+                return false;
+            }
+            $paths[$path_key] = $path;
+        }
+
+        // Set directory properties.
+        $this->composerRoot = $paths[self::COMPOSER_ROOT_KEY];
+        $this->drupalRoot = $paths[self::DRUPAL_ROOT_KEY];
+        $this->vendorDir = $paths[self::VENDOR_DIR_KEY];
+
+        return true;
     }
 }
