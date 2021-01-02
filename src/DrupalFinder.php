@@ -28,21 +28,21 @@ class DrupalFinder
      *
      * @var string
      */
-    protected const DRUPAL_ROOT_KEY = 'drupal_root';
+    const DRUPAL_ROOT_KEY = 'drupal_root';
 
     /**
      * Composer root key used when doing env vars check.
      *
      * @var string
      */
-    protected const COMPOSER_ROOT_KEY = 'composer_root';
+    const COMPOSER_ROOT_KEY = 'composer_root';
 
     /**
      * Vendor dir key used when doing env vars check.
      *
      * @var string
      */
-    protected const VENDOR_DIR_KEY = 'vendor_dir';
+    const VENDOR_DIR_KEY = 'vendor_dir';
 
     /**
      * Composer vendor directory.
