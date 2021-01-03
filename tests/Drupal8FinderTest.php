@@ -3,6 +3,7 @@
 namespace DrupalFinder\Tests;
 
 use org\bovigo\vfs\vfsStream;
+use DrupalFinder\DrupalFinder;
 
 class Drupal8FinderTest extends DrupalFinderTestBase
 {
@@ -85,12 +86,6 @@ class Drupal8FinderTest extends DrupalFinderTestBase
         return $fileStructure;
     }
 
-    protected function setUp()
-    {
-        parent::setUp();
-        $this->finder = new \DrupalFinder\DrupalFinder();
-    }
-
     protected function tearDown()
     {
         parent::tearDown();
@@ -103,17 +98,18 @@ class Drupal8FinderTest extends DrupalFinderTestBase
 
     public function testDrupalDefaultStructure()
     {
+        $finder = new DrupalFinder();
         $root = vfsStream::setup('root', null, $this->prepareFileStructure(static::$fileStructure));
 
-        $this->assertTrue($this->finder->locateRoot($root->url()));
-        $this->assertSame('vfs://root', $this->finder->getDrupalRoot());
-        $this->assertSame('vfs://root', $this->finder->getComposerRoot());
-        $this->assertSame('vfs://root/vendor', $this->finder->getVendorDir());
+        $this->assertTrue($finder->locateRoot($root->url()));
+        $this->assertSame('vfs://root', $finder->getDrupalRoot());
+        $this->assertSame('vfs://root', $finder->getComposerRoot());
+        $this->assertSame('vfs://root/vendor', $finder->getVendorDir());
 
-        $this->assertTrue($this->finder->locateRoot($root->url() . '/misc'));
-        $this->assertSame('vfs://root', $this->finder->getDrupalRoot());
-        $this->assertSame('vfs://root', $this->finder->getComposerRoot());
-        $this->assertSame('vfs://root/vendor', $this->finder->getVendorDir());
+        $this->assertTrue($finder->locateRoot($root->url() . '/misc'));
+        $this->assertSame('vfs://root', $finder->getDrupalRoot());
+        $this->assertSame('vfs://root', $finder->getComposerRoot());
+        $this->assertSame('vfs://root/vendor', $finder->getVendorDir());
 
         $root = vfsStream::setup(
             'root',
@@ -121,27 +117,28 @@ class Drupal8FinderTest extends DrupalFinderTestBase
             ['project' => $this->prepareFileStructure(static::$fileStructure)]
         );
         $this->assertFalse(
-            $this->finder->locateRoot($root->url()),
+            $finder->locateRoot($root->url()),
             'Not in the scope of the project'
         );
-        $this->assertFalse($this->finder->getDrupalRoot());
-        $this->assertFalse($this->finder->getComposerRoot());
-        $this->assertFalse($this->finder->getVendorDir());
+        $this->assertFalse($finder->getDrupalRoot());
+        $this->assertFalse($finder->getComposerRoot());
+        $this->assertFalse($finder->getVendorDir());
     }
 
     public function testDrupalDefaultStructure_8_8_x()
     {
+        $finder = new DrupalFinder();
         $root = vfsStream::setup('root', null, $this->prepareFileStructure(static::$fileStructureDrupal_8_8_x));
 
-        $this->assertTrue($this->finder->locateRoot($root->url()));
-        $this->assertSame('vfs://root', $this->finder->getDrupalRoot());
-        $this->assertSame('vfs://root', $this->finder->getComposerRoot());
-        $this->assertSame('vfs://root/vendor', $this->finder->getVendorDir());
+        $this->assertTrue($finder->locateRoot($root->url()));
+        $this->assertSame('vfs://root', $finder->getDrupalRoot());
+        $this->assertSame('vfs://root', $finder->getComposerRoot());
+        $this->assertSame('vfs://root/vendor', $finder->getVendorDir());
 
-        $this->assertTrue($this->finder->locateRoot($root->url() . '/misc'));
-        $this->assertSame('vfs://root', $this->finder->getDrupalRoot());
-        $this->assertSame('vfs://root', $this->finder->getComposerRoot());
-        $this->assertSame('vfs://root/vendor', $this->finder->getVendorDir());
+        $this->assertTrue($finder->locateRoot($root->url() . '/misc'));
+        $this->assertSame('vfs://root', $finder->getDrupalRoot());
+        $this->assertSame('vfs://root', $finder->getComposerRoot());
+        $this->assertSame('vfs://root/vendor', $finder->getVendorDir());
 
         $root = vfsStream::setup(
           'root',
@@ -149,12 +146,12 @@ class Drupal8FinderTest extends DrupalFinderTestBase
           ['project' => $this->prepareFileStructure(static::$fileStructure)]
         );
         $this->assertFalse(
-          $this->finder->locateRoot($root->url()),
+          $finder->locateRoot($root->url()),
           'Not in the scope of the project'
         );
-        $this->assertFalse($this->finder->getDrupalRoot());
-        $this->assertFalse($this->finder->getComposerRoot());
-        $this->assertFalse($this->finder->getVendorDir());
+        $this->assertFalse($finder->getDrupalRoot());
+        $this->assertFalse($finder->getComposerRoot());
+        $this->assertFalse($finder->getVendorDir());
     }
 
     public function testDrupalComposerStructure()
@@ -165,6 +162,7 @@ class Drupal8FinderTest extends DrupalFinderTestBase
 
     public function testDrupalComposerStructureWithCustomRoot()
     {
+        $finder = new DrupalFinder();
         $fileStructure = [
             'src' => static::$fileStructure,
             'composer.json' => [
@@ -186,30 +184,30 @@ class Drupal8FinderTest extends DrupalFinderTestBase
 
         $fileStructure = $this->prepareFileStructure($fileStructure);
         $root = vfsStream::setup('root', null, $fileStructure);
-        $this->assertTrue($this->finder->locateRoot($root->url() . '/src'));
-        $this->assertSame('vfs://root/src', $this->finder->getDrupalRoot());
-        $this->assertSame('vfs://root', $this->finder->getComposerRoot());
-        $this->assertSame('vfs://root/vendor', $this->finder->getVendorDir());
+        $this->assertTrue($finder->locateRoot($root->url() . '/src'));
+        $this->assertSame('vfs://root/src', $finder->getDrupalRoot());
+        $this->assertSame('vfs://root', $finder->getComposerRoot());
+        $this->assertSame('vfs://root/vendor', $finder->getVendorDir());
 
-        $this->assertTrue($this->finder->locateRoot($root->url() . '/src/misc'));
-        $this->assertSame('vfs://root/src', $this->finder->getDrupalRoot());
-        $this->assertSame('vfs://root', $this->finder->getComposerRoot());
-        $this->assertSame('vfs://root/vendor', $this->finder->getVendorDir());
+        $this->assertTrue($finder->locateRoot($root->url() . '/src/misc'));
+        $this->assertSame('vfs://root/src', $finder->getDrupalRoot());
+        $this->assertSame('vfs://root', $finder->getComposerRoot());
+        $this->assertSame('vfs://root/vendor', $finder->getVendorDir());
 
-        $this->assertTrue($this->finder->locateRoot($root->url()));
-        $this->assertSame('vfs://root/src', $this->finder->getDrupalRoot());
-        $this->assertSame('vfs://root', $this->finder->getComposerRoot());
-        $this->assertSame('vfs://root/vendor', $this->finder->getVendorDir());
+        $this->assertTrue($finder->locateRoot($root->url()));
+        $this->assertSame('vfs://root/src', $finder->getDrupalRoot());
+        $this->assertSame('vfs://root', $finder->getComposerRoot());
+        $this->assertSame('vfs://root/vendor', $finder->getVendorDir());
 
         $root = vfsStream::setup(
             'root',
             null,
             ['nested_folder' => $fileStructure]
         );
-        $this->assertFalse($this->finder->locateRoot($root->url()));
-        $this->assertFalse($this->finder->getDrupalRoot());
-        $this->assertFalse($this->finder->getComposerRoot());
-        $this->assertFalse($this->finder->getVendorDir());
+        $this->assertFalse($finder->locateRoot($root->url()));
+        $this->assertFalse($finder->getDrupalRoot());
+        $this->assertFalse($finder->getComposerRoot());
+        $this->assertFalse($finder->getVendorDir());
     }
 
     public function testDrupalComposerStructureWithoutRequire()
@@ -232,56 +230,60 @@ class Drupal8FinderTest extends DrupalFinderTestBase
 
     public function testNoDrupalRootWithRealFilesystem()
     {
+        $finder = new DrupalFinder();
         $root = $this->tempdir(sys_get_temp_dir());
 
-        $this->assertFalse($this->finder->locateRoot($root));
-        $this->assertFalse($this->finder->getDrupalRoot());
-        $this->assertFalse($this->finder->getComposerRoot());
-        $this->assertFalse($this->finder->getVendorDir());
+        $this->assertFalse($finder->locateRoot($root));
+        $this->assertFalse($finder->getDrupalRoot());
+        $this->assertFalse($finder->getComposerRoot());
+        $this->assertFalse($finder->getVendorDir());
     }
 
     public function testDrupalDefaultStructureWithRealFilesystem()
     {
+        $finder = new DrupalFinder();
         $root = $this->tempdir(sys_get_temp_dir());
         $this->dumpToFileSystem(static::$fileStructure, $root);
 
-        $this->assertTrue($this->finder->locateRoot($root));
-        $this->assertSame($root, $this->finder->getDrupalRoot());
-        $this->assertSame($root, $this->finder->getComposerRoot());
-        $this->assertSame($root . '/vendor', $this->finder->getVendorDir());
+        $this->assertTrue($finder->locateRoot($root));
+        $this->assertSame($root, $finder->getDrupalRoot());
+        $this->assertSame($root, $finder->getComposerRoot());
+        $this->assertSame($root . '/vendor', $finder->getVendorDir());
 
         // Test symlink implementation
         $symlink = $this->tempdir(sys_get_temp_dir());
         $this->symlink($root, $symlink . '/foo');
 
-        $this->assertTrue($this->finder->locateRoot($symlink . '/foo'));
-        $this->assertSame($root, $this->finder->getDrupalRoot());
-        $this->assertSame($root, $this->finder->getComposerRoot());
-        $this->assertSame($root . '/vendor', $this->finder->getVendorDir());
+        $this->assertTrue($finder->locateRoot($symlink . '/foo'));
+        $this->assertSame($root, $finder->getDrupalRoot());
+        $this->assertSame($root, $finder->getComposerRoot());
+        $this->assertSame($root . '/vendor', $finder->getVendorDir());
     }
 
     public function testDrupalComposerStructureWithRealFilesystem()
     {
+        $finder = new DrupalFinder();
         $root = $this->tempdir(sys_get_temp_dir());
         $this->dumpToFileSystem($this->getDrupalComposerStructure(), $root);
 
-        $this->assertTrue($this->finder->locateRoot($root));
-        $this->assertSame($root . '/web', $this->finder->getDrupalRoot());
-        $this->assertSame($root, $this->finder->getComposerRoot());
-        $this->assertSame($root . '/vendor', $this->finder->getVendorDir());
+        $this->assertTrue($finder->locateRoot($root));
+        $this->assertSame($root . '/web', $finder->getDrupalRoot());
+        $this->assertSame($root, $finder->getComposerRoot());
+        $this->assertSame($root . '/vendor', $finder->getVendorDir());
 
         // Test symlink implementation
         $symlink = $this->tempdir(sys_get_temp_dir());
         $this->symlink($root, $symlink . '/foo');
 
-        $this->assertTrue($this->finder->locateRoot($symlink . '/foo'));
-        $this->assertSame($root . '/web', $this->finder->getDrupalRoot());
-        $this->assertSame($root, $this->finder->getComposerRoot());
-        $this->assertSame($root . '/vendor', $this->finder->getVendorDir());
+        $this->assertTrue($finder->locateRoot($symlink . '/foo'));
+        $this->assertSame($root . '/web', $finder->getDrupalRoot());
+        $this->assertSame($root, $finder->getComposerRoot());
+        $this->assertSame($root . '/vendor', $finder->getVendorDir());
     }
 
     public function testDrupalWithLinkedModule()
     {
+        $finder = new DrupalFinder();
         $root = $this->tempdir(sys_get_temp_dir());
         $this->dumpToFileSystem(static::$fileStructure, $root);
 
@@ -289,14 +291,15 @@ class Drupal8FinderTest extends DrupalFinderTestBase
         $module_link = $root . '/modules/foo';
         $this->symlink($module, $module_link);
 
-        $this->assertTrue($this->finder->locateRoot($module_link));
-        $this->assertSame($root, realpath($this->finder->getDrupalRoot()));
-        $this->assertSame($root, realpath($this->finder->getComposerRoot()));
-        $this->assertSame($root . '/vendor', realpath($this->finder->getVendorDir()));
+        $this->assertTrue($finder->locateRoot($module_link));
+        $this->assertSame($root, realpath($finder->getDrupalRoot()));
+        $this->assertSame($root, realpath($finder->getComposerRoot()));
+        $this->assertSame($root . '/vendor', realpath($finder->getVendorDir()));
     }
 
     public function testDrupalWithCustomVendor()
     {
+        $finder = new DrupalFinder();
         $root = $this->tempdir(sys_get_temp_dir());
         $fileStructure = static::$fileStructure;
         $fileStructure['composer.json'] = [
@@ -307,96 +310,59 @@ class Drupal8FinderTest extends DrupalFinderTestBase
         $fileStructure['vendor-foo'] = [];
         $this->dumpToFileSystem($fileStructure, $root);
 
-        $this->assertTrue($this->finder->locateRoot($root));
-        $this->assertSame($root, realpath($this->finder->getDrupalRoot()));
-        $this->assertSame($root, realpath($this->finder->getComposerRoot()));
-        $this->assertSame($root . '/vendor-foo', realpath($this->finder->getVendorDir()));
+        $this->assertTrue($finder->locateRoot($root));
+        $this->assertSame($root, realpath($finder->getDrupalRoot()));
+        $this->assertSame($root, realpath($finder->getComposerRoot()));
+        $this->assertSame($root . '/vendor-foo', realpath($finder->getVendorDir()));
     }
 
-    public function testEnvironmentFallbackWithoutComposerJson() {
-
+    public function testDrupalEnvironmentVariable() {
+        $finder = new DrupalFinder();
         $fileStructure = [
             'web' => [],
-            'vendor' => [
-                'autoload.php'
-            ]
         ];
 
         $root = $this->tempdir(sys_get_temp_dir());
         $this->dumpToFileSystem($fileStructure, $root);
 
         $drupal_root = $root . '/web';
-        $composer_root = $root . '/';
-        $vendor_dir = $root . '/vendor';
 
-        putenv("DRUPAL_FINDER_DRUPAL_ROOT=$drupal_root");
-        putenv("DRUPAL_FINDER_COMPOSER_ROOT=$composer_root");
-        putenv("DRUPAL_FINDER_VENDOR_DIR=$vendor_dir");
+        putenv("{$this->envNameDrupal}=$drupal_root");
 
-        $this->assertTrue($this->finder->locateRoot($root));
-        $this->assertSame($this->finder->getDrupalRoot(), $drupal_root);
-        $this->assertSame($this->finder->getComposerRoot(), $composer_root);
-        $this->assertSame($this->finder->getVendorDir(), $vendor_dir);
+        $this->assertTrue($finder->locateRoot($root));
+        $this->assertSame($finder->getDrupalRoot(), $drupal_root);
     }
 
-    public function testEnvironmentFallbackWithoutDrupalVariable() {
+    public function testVendorEnvironmentVariable() {
+        $finder = new DrupalFinder();
         $fileStructure = [
-            'web' => [],
-            'vendor' => [
-                'autoload.php'
-            ]
+            'vendor' => [],
         ];
 
         $root = $this->tempdir(sys_get_temp_dir());
         $this->dumpToFileSystem($fileStructure, $root);
 
-        $composer_root = $root . '/';
         $vendor_dir = $root . '/vendor';
 
-        putenv("DRUPAL_FINDER_COMPOSER_ROOT=$composer_root");
-        putenv("DRUPAL_FINDER_VENDOR_DIR=$vendor_dir");
+        putenv("{$this->envNameVendor}=$vendor_dir");
 
-        $this->assertFalse($this->finder->locateRoot($root));
+        $this->assertFalse($finder->locateRoot($root));
+        $this->assertSame($finder->getVendorDir(), $vendor_dir);
     }
 
-    public function testEnvironmentFallbackWithoutComposerVariable() {
-        $fileStructure = [
-            'web' => [],
-            'vendor' => [
-                'autoload.php'
-            ]
-        ];
+    public function testComposerEnvironmentVariable() {
+        $finder = new DrupalFinder();
+        $fileStructure = [];
 
         $root = $this->tempdir(sys_get_temp_dir());
         $this->dumpToFileSystem($fileStructure, $root);
 
-        $drupal_root = $root . '/web';
-        $vendor_dir = $root . '/vendor';
+        $composer_dir = $root;
 
-        putenv("DRUPAL_FINDER_DRUPAL_ROOT=$drupal_root");
-        putenv("DRUPAL_FINDER_VENDOR_DIR=$vendor_dir");
+        putenv("{$this->envNameComposer}=$composer_dir");
 
-        $this->assertFalse($this->finder->locateRoot($root));
-    }
-
-    public function testEnvironmentFallbackWithoutVendorVariable() {
-        $fileStructure = [
-            'web' => [],
-            'vendor' => [
-                'autoload.php'
-            ]
-        ];
-
-        $root = $this->tempdir(sys_get_temp_dir());
-        $this->dumpToFileSystem($fileStructure, $root);
-
-        $drupal_root = $root . '/web';
-        $composer_root = $root . '/';
-
-        putenv("DRUPAL_FINDER_DRUPAL_ROOT=$drupal_root");
-        putenv("DRUPAL_FINDER_COMPOSER_ROOT=$composer_root");
-
-        $this->assertFalse($this->finder->locateRoot($root));
+        $this->assertFalse($finder->locateRoot($root));
+        $this->assertSame($finder->getComposerRoot(), $composer_dir);
     }
 
     /**
@@ -404,31 +370,32 @@ class Drupal8FinderTest extends DrupalFinderTestBase
      */
     protected function assertComposerStructure($fileStructure)
     {
+        $finder = new DrupalFinder();
         $fileStructure = $this->prepareFileStructure($fileStructure);
         $root = vfsStream::setup('root', null, $fileStructure);
-        $this->assertTrue($this->finder->locateRoot($root->url() . '/web'));
-        $this->assertSame('vfs://root/web', $this->finder->getDrupalRoot());
-        $this->assertSame('vfs://root', $this->finder->getComposerRoot());
-        $this->assertSame('vfs://root/vendor', $this->finder->getVendorDir());
+        $this->assertTrue($finder->locateRoot($root->url() . '/web'));
+        $this->assertSame('vfs://root/web', $finder->getDrupalRoot());
+        $this->assertSame('vfs://root', $finder->getComposerRoot());
+        $this->assertSame('vfs://root/vendor', $finder->getVendorDir());
 
-        $this->assertTrue($this->finder->locateRoot($root->url() . '/web/misc'));
-        $this->assertSame('vfs://root/web', $this->finder->getDrupalRoot());
-        $this->assertSame('vfs://root', $this->finder->getComposerRoot());
-        $this->assertSame('vfs://root/vendor', $this->finder->getVendorDir());
+        $this->assertTrue($finder->locateRoot($root->url() . '/web/misc'));
+        $this->assertSame('vfs://root/web', $finder->getDrupalRoot());
+        $this->assertSame('vfs://root', $finder->getComposerRoot());
+        $this->assertSame('vfs://root/vendor', $finder->getVendorDir());
 
-        $this->assertTrue($this->finder->locateRoot($root->url()));
-        $this->assertSame('vfs://root/web', $this->finder->getDrupalRoot());
-        $this->assertSame('vfs://root', $this->finder->getComposerRoot());
-        $this->assertSame('vfs://root/vendor', $this->finder->getVendorDir());
+        $this->assertTrue($finder->locateRoot($root->url()));
+        $this->assertSame('vfs://root/web', $finder->getDrupalRoot());
+        $this->assertSame('vfs://root', $finder->getComposerRoot());
+        $this->assertSame('vfs://root/vendor', $finder->getVendorDir());
 
         $root = vfsStream::setup(
             'root',
             null,
             ['nested_folder' => $fileStructure]
         );
-        $this->assertFalse($this->finder->locateRoot($root->url()));
-        $this->assertFalse($this->finder->getDrupalRoot());
-        $this->assertFalse($this->finder->getComposerRoot());
-        $this->assertFalse($this->finder->getVendorDir());
+        $this->assertFalse($finder->locateRoot($root->url()));
+        $this->assertFalse($finder->getDrupalRoot());
+        $this->assertFalse($finder->getComposerRoot());
+        $this->assertFalse($finder->getVendorDir());
     }
 }

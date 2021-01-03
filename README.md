@@ -11,7 +11,7 @@ $drupalFinder = new \DrupalFinder\DrupalFinder();
 if ($drupalFinder->locateRoot(getcwd())) {
     $drupalRoot = $drupalFinder->getDrupalRoot();
     $composerRoot = $drupalFinder->getComposerRoot();
-    ...
+    $vendorDir = $drupalFinder->getVendorDir();
 }
 ```
 
@@ -33,6 +33,10 @@ For example:
 This is useful for situations where you are containerizing an application,
 directories may be in odd places, or a composer.json might be missing since it
 is unneeded in a final build artifact.
+
+You are not required to set all the environment variables to use this
+feature. If you set an environment variable, then its associated getter
+function will return the value assigned to the environment variable.
 
 ## Examples
 

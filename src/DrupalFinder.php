@@ -10,6 +10,21 @@ namespace DrupalFinder;
 class DrupalFinder
 {
     /**
+     * Drupal root environment variable.
+     */
+    const ENV_DRUPAL_ROOT = 'DRUPAL_FINDER_DRUPAL_ROOT';
+
+    /**
+     * Composer root environment variable.
+     */
+    const ENV_COMPOSER_ROOT = 'DRUPAL_FINDER_COMPOSER_ROOT';
+
+    /**
+     * Vendor directory environment variable.
+     */
+    const ENV_VENDOR_DIR = 'DRUPAL_FINDER_VENDOR_DIR';
+
+    /**
      * Drupal web public directory.
      *
      * @var string
@@ -24,27 +39,6 @@ class DrupalFinder
     private $composerRoot;
 
     /**
-     * Drupal root key used when doing env vars check.
-     *
-     * @var string
-     */
-    const DRUPAL_ROOT_KEY = 'drupal_root';
-
-    /**
-     * Composer root key used when doing env vars check.
-     *
-     * @var string
-     */
-    const COMPOSER_ROOT_KEY = 'composer_root';
-
-    /**
-     * Vendor dir key used when doing env vars check.
-     *
-     * @var string
-     */
-    const VENDOR_DIR_KEY = 'vendor_dir';
-
-    /**
      * Composer vendor directory.
      *
      * @var string
@@ -53,65 +47,140 @@ class DrupalFinder
      */
     private $vendorDir;
 
-    public function locateRoot($start_path)
-    {
+    /**
+     * Initialize finder.
+     *
+     * Optionally pass the starting path.
+     *
+     * @param string|null $start_path
+     *   The path to begin the search from.
+     *
+     * @throws \Exception
+     * @todo Make $start_path mandatory in v2.
+     */
+    public function __construct($start_path = null) {
+        // Initialize path variables to false, indicating their locations are
+        // not yet known.
         $this->drupalRoot = false;
         $this->composerRoot = false;
         $this->vendorDir = false;
 
-        // If valid environment variables have been specified which indicate
-        // the paths of composer root, drupal root, and vendor directory.
-        if ($this->validExplicitPaths()) {
-            return true;
+        // If a starting path was provided, attempt to locate and set path
+        // variables.
+        if (!empty($start_path)) {
+            $this->discoverRoots($start_path);
         }
+    }
+
+    /**
+     * Locate Drupal, Composer, and vendor directory paths.
+     *
+     * @param string $start_path
+     *   The path to begin the search from.
+     *
+     * @return bool
+     *   True if the Drupal root was identified, false otherwise.
+     *
+     * @throws \Exception
+     *
+     * @deprecated Will be removed in v2. Future usage should instantiate
+     *   a new DrupalFinder object by passing the starting path to its
+     *   constructor.
+     */
+    public function locateRoot($start_path)
+    {
+        $this->discoverRoots($start_path);
+        return !empty($this->getDrupalRoot());
+    }
+
+    /**
+     * Get the Drupal root.
+     *
+     * @return string|bool
+     *   The path to the Drupal root, if it was discovered. False otherwise.
+     */
+    public function getDrupalRoot()
+    {
+        $environment_path = $this->getValidEnvironmentVariablePath(self::ENV_DRUPAL_ROOT);
+
+        return !empty($environment_path) ? $environment_path : $this->drupalRoot;
+    }
+
+    /**
+     * Get the Composer root.
+     *
+     * @return string|bool
+     *   The path to the Composer root, if it was discovered. False otherwise.
+     */
+    public function getComposerRoot()
+    {
+        $environment_path = $this->getValidEnvironmentVariablePath(self::ENV_COMPOSER_ROOT);
+        return !empty($environment_path) ? $environment_path : $this->composerRoot;
+    }
+
+    /**
+     * Get the vendor path.
+     *
+     * @return string|bool
+     *   The path to the vendor directory, if it was found. False otherwise.
+     */
+    public function getVendorDir()
+    {
+        $environment_path = $this->getValidEnvironmentVariablePath(self::ENV_VENDOR_DIR);
+        return !empty($environment_path) ? $environment_path : $this->vendorDir;
+    }
+
+    /**
+     * Discover all valid paths.
+     *
+     * @param $start_path
+     *   The path to start the search from.
+     *
+     * @throws \Exception
+     */
+    protected function discoverRoots($start_path) {
+        // Since we are discovering, reset all path variables.
+        $this->drupalRoot = false;
+        $this->composerRoot = false;
+        $this->vendorDir = false;
 
         foreach (array(true, false) as $follow_symlinks) {
             $path = $start_path;
             if ($follow_symlinks && is_link($path)) {
                 $path = realpath($path);
             }
+
             // Check the start path.
-            if ($this->isValidRoot($path)) {
-                return true;
+            if ($this->findAndValidateRoots($path)) {
+                return;
             } else {
                 // Move up dir by dir and check each.
                 while ($path = $this->shiftPathUp($path)) {
                     if ($follow_symlinks && is_link($path)) {
                         $path = realpath($path);
                     }
-                    if ($this->isValidRoot($path)) {
-                        return true;
+                    if ($this->findAndValidateRoots($path)) {
+                        return;
                     }
                 }
             }
         }
-
-        return false;
     }
 
     /**
-     * Returns parent directory.
+     * Determine if a valid Drupal root exists.
      *
-     * @param string
-     *   Path to start from
+     * In addition, set any valid path properties if they are found.
      *
-     * @return string|false
-     *   Parent path of given path or false when $path is filesystem root
-     */
-    private function shiftPathUp($path)
-    {
-        $parent = dirname($path);
-
-        return in_array($parent, ['.', $path]) ? false : $parent;
-    }
-
-    /**
      * @param $path
+     *   The starting path to search from.
      *
      * @return bool
+     *   True if all roots were discovered and validated. False otherwise.
      */
-    protected function isValidRoot($path)
+    protected function findAndValidateRoots($path)
     {
+
         if (!empty($path) && is_dir($path) && file_exists($path . '/autoload.php') && file_exists($path . '/' . $this->getComposerFileName())) {
             // Additional check for the presence of core/composer.json to
             // grant it is not a Drupal 7 site with a base folder named "core".
@@ -164,23 +233,7 @@ class DrupalFinder
             }
         }
 
-        return $this->drupalRoot && $this->composerRoot && $this->vendorDir;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDrupalRoot()
-    {
-        return $this->drupalRoot;
-    }
-
-    /**
-     * @return string
-     */
-    public function getComposerRoot()
-    {
-        return $this->composerRoot;
+        return $this->allPathsDiscovered();
     }
 
     /**
@@ -192,44 +245,56 @@ class DrupalFinder
     }
 
     /**
-     * @return string
+     * Helper function to quickly determine whether or not all paths were discovered.
+     *
+     * @return bool
+     *   True if all paths have been discovered, false if one or more haven't been found.
      */
-    public function getVendorDir()
-    {
-        return $this->vendorDir;
+    protected function allPathsDiscovered() {
+        return !empty($this->drupalRoot) && !empty($this->composerRoot) && !empty($this->vendorDir);
     }
 
     /**
-     * Try to extract valid paths from environment variables.
+     * Helper function to quickly determine whether or not all paths are known.
      *
      * @return bool
-     *   True if valid fallback environment variables were specified. False otherwise.
+     *   True if all paths are known, false if one or more paths are unknown.
      */
-    protected function validExplicitPaths() {
-        $env_vars = [
-            self::COMPOSER_ROOT_KEY => 'DRUPAL_FINDER_COMPOSER_ROOT',
-            self::DRUPAL_ROOT_KEY => 'DRUPAL_FINDER_DRUPAL_ROOT',
-            self::VENDOR_DIR_KEY => 'DRUPAL_FINDER_VENDOR_DIR',
-        ];
-
-        $paths = [];
-
-        // First, validate that all of the expected environment variables exist,
-        // and that they each point to a valid directory. If even one is not
-        // set, then consider the environment variable fallback to be invalid.
-        foreach ($env_vars as $path_key => $path_var) {
-            $path = getenv($path_var);
-            if (!is_string($path) || !is_dir($path)) {
-                return false;
-            }
-            $paths[$path_key] = $path;
-        }
-
-        // Set directory properties.
-        $this->composerRoot = $paths[self::COMPOSER_ROOT_KEY];
-        $this->drupalRoot = $paths[self::DRUPAL_ROOT_KEY];
-        $this->vendorDir = $paths[self::VENDOR_DIR_KEY];
-
-        return true;
+    protected function allPathsKnown() {
+        return !empty($this->getDrupalRoot()) && !empty($this->getComposerRoot()) && !empty($this->getVendorDir());
     }
+
+    /**
+     * Get path stored in environment variable.
+     *
+     * @param string $variable
+     *   The name of the environment variable to retrieve the path from.
+     *
+     * @return false|string
+     *   A path if it is valid. False otherwise.
+     */
+    protected function getValidEnvironmentVariablePath($variable) {
+        $path = getenv($variable);
+        if (is_string($path) && is_dir($path)) {
+            return $path;
+        }
+        return false;
+    }
+
+    /**
+     * Returns parent directory.
+     *
+     * @param string
+     *   Path to start from
+     *
+     * @return string|false
+     *   Parent path of given path or false when $path is filesystem root
+     */
+    private function shiftPathUp($path)
+    {
+        $parent = dirname($path);
+
+        return in_array($parent, ['.', $path]) ? false : $parent;
+    }
+
 }

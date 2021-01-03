@@ -9,14 +9,26 @@ use PHPUnit_Framework_TestCase;
 abstract class DrupalFinderTestBase extends PHPUnit_Framework_TestCase
 {
     /**
-     * @var \DrupalFinder\DrupalFinder
+     * @var string
      */
-    protected $finder;
+    protected $envNameDrupal;
+
+    /**
+     * @var string
+     */
+    protected $envNameComposer;
+
+    /**
+     * @var string
+     */
+    protected $envNameVendor;
 
     protected function setUp()
     {
         parent::setUp();
-        $this->finder = new DrupalFinder();
+        $this->envNameDrupal = DrupalFinder::ENV_DRUPAL_ROOT;
+        $this->envNameComposer = DrupalFinder::ENV_COMPOSER_ROOT;
+        $this->envNameVendor = DrupalFinder::ENV_VENDOR_DIR;
     }
 
     protected function dumpToFileSystem($fileStructure, $root)
