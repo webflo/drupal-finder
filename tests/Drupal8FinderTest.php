@@ -86,16 +86,6 @@ class Drupal8FinderTest extends DrupalFinderTestBase
         return $fileStructure;
     }
 
-    protected function tearDown()
-    {
-        parent::tearDown();
-        // Unset variables to ensure their values don't carry over into other
-        // tests that are going to run.
-        putenv('DRUPAL_FINDER_DRUPAL_ROOT');
-        putenv('DRUPAL_FINDER_COMPOSER_ROOT');
-        putenv('DRUPAL_FINDER_VENDOR_DIR');
-    }
-
     public function testDrupalDefaultStructure()
     {
         $finder = new DrupalFinder();
@@ -316,55 +306,6 @@ class Drupal8FinderTest extends DrupalFinderTestBase
         $this->assertSame($root . '/vendor-foo', realpath($finder->getVendorDir()));
     }
 
-    public function testDrupalEnvironmentVariable() {
-        $finder = new DrupalFinder();
-        $fileStructure = [
-            'web' => [],
-        ];
-
-        $root = $this->tempdir(sys_get_temp_dir());
-        $this->dumpToFileSystem($fileStructure, $root);
-
-        $drupal_root = $root . '/web';
-
-        putenv("{$this->envNameDrupal}=$drupal_root");
-
-        $this->assertTrue($finder->locateRoot($root));
-        $this->assertSame($finder->getDrupalRoot(), $drupal_root);
-    }
-
-    public function testVendorEnvironmentVariable() {
-        $finder = new DrupalFinder();
-        $fileStructure = [
-            'vendor' => [],
-        ];
-
-        $root = $this->tempdir(sys_get_temp_dir());
-        $this->dumpToFileSystem($fileStructure, $root);
-
-        $vendor_dir = $root . '/vendor';
-
-        putenv("{$this->envNameVendor}=$vendor_dir");
-
-        $this->assertFalse($finder->locateRoot($root));
-        $this->assertSame($finder->getVendorDir(), $vendor_dir);
-    }
-
-    public function testComposerEnvironmentVariable() {
-        $finder = new DrupalFinder();
-        $fileStructure = [];
-
-        $root = $this->tempdir(sys_get_temp_dir());
-        $this->dumpToFileSystem($fileStructure, $root);
-
-        $composer_dir = $root;
-
-        putenv("{$this->envNameComposer}=$composer_dir");
-
-        $this->assertFalse($finder->locateRoot($root));
-        $this->assertSame($finder->getComposerRoot(), $composer_dir);
-    }
-
     /**
      * @param $fileStructure
      */
@@ -398,4 +339,5 @@ class Drupal8FinderTest extends DrupalFinderTestBase
         $this->assertFalse($finder->getComposerRoot());
         $this->assertFalse($finder->getVendorDir());
     }
+
 }

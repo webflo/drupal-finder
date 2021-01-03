@@ -31,6 +31,68 @@ abstract class DrupalFinderTestBase extends PHPUnit_Framework_TestCase
         $this->envNameVendor = DrupalFinder::ENV_VENDOR_DIR;
     }
 
+    protected function tearDown()
+    {
+        parent::tearDown();
+        // Unset variables to ensure their values don't carry over into other
+        // tests that are going to run.
+        putenv('DRUPAL_FINDER_DRUPAL_ROOT');
+        putenv('DRUPAL_FINDER_COMPOSER_ROOT');
+        putenv('DRUPAL_FINDER_VENDOR_DIR');
+    }
+
+    public function testOnlyDrupalEnvironmentVariable() {
+        $finder = new DrupalFinder();
+        $fileStructure = [
+            'web' => [],
+        ];
+
+        $root = $this->tempdir(sys_get_temp_dir());
+        $this->dumpToFileSystem($fileStructure, $root);
+
+        $drupal_root = $root . '/web';
+
+        putenv("{$this->envNameDrupal}=$drupal_root");
+
+        // DrupalFinder::locateRoot should be true if the Drupal root is known.
+        $this->assertTrue($finder->locateRoot($root));
+        $this->assertSame($finder->getDrupalRoot(), $drupal_root);
+    }
+
+    public function testOnlyVendorEnvironmentVariable() {
+        $finder = new DrupalFinder();
+        $fileStructure = [
+            'vendor' => [],
+        ];
+
+        $root = $this->tempdir(sys_get_temp_dir());
+        $this->dumpToFileSystem($fileStructure, $root);
+
+        $vendor_dir = $root . '/vendor';
+
+        putenv("{$this->envNameVendor}=$vendor_dir");
+
+        // DrupalFinder::locateRoot should be false since Drupal root is unknown.
+        $this->assertFalse($finder->locateRoot($root));
+        $this->assertSame($finder->getVendorDir(), $vendor_dir);
+    }
+
+    public function testOnlyComposerEnvironmentVariable() {
+        $finder = new DrupalFinder();
+        $fileStructure = [];
+
+        $root = $this->tempdir(sys_get_temp_dir());
+        $this->dumpToFileSystem($fileStructure, $root);
+
+        $composer_dir = $root;
+
+        putenv("{$this->envNameComposer}=$composer_dir");
+
+        // DrupalFinder::locateRoot should be false since Drupal root is unknown.
+        $this->assertFalse($finder->locateRoot($root));
+        $this->assertSame($finder->getComposerRoot(), $composer_dir);
+    }
+
     protected function dumpToFileSystem($fileStructure, $root)
     {
         $fileStructure = $this->prepareFileStructure($fileStructure);
