@@ -59,6 +59,12 @@ class DrupalFinder
         $this->composerRoot = false;
         $this->vendorDir = false;
 
+        // If valid environment variables have been specified which indicate
+        // the paths of composer root, drupal root, and vendor directory.
+        if ($this->validExplicitPaths()) {
+            return true;
+        }
+
         foreach (array(true, false) as $follow_symlinks) {
             $path = $start_path;
             if ($follow_symlinks && is_link($path)) {
@@ -78,13 +84,6 @@ class DrupalFinder
                     }
                 }
             }
-        }
-
-        // If original build logic fails, check if valid environment variables
-        // have been specified which indicate the paths of composer root,
-        // drupal root, and vendor directory.
-        if ($this->validExplicitPaths()) {
-          return true;
         }
 
         return false;
