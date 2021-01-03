@@ -15,11 +15,10 @@ if ($drupalFinder->locateRoot(getcwd())) {
 }
 ```
 
-### Environment variables fallback
+### Environment variables
 
-If normal detection fails (e.g. you do not have a composer.json file), then the
-detection mechanism switches over to looking for explicitly set environment
-variables, which point to the pertinent directory:
+If a set of environment variables is specified, then Drupal Finder uses those
+values to determine the paths of the pertinent directories:
 
 - `DRUPAL_FINDER_DRUPAL_ROOT`
 - `DRUPAL_FINDER_COMPOSER_ROOT`
@@ -30,6 +29,10 @@ For example:
 - `DRUPAL_FINDER_DRUPAL_ROOT=/var/www/web`
 - `DRUPAL_FINDER_COMPOSER_ROOT=/var/www`
 - `DRUPAL_FINDER_VENDOR_DIR=/var/www/vendor`
+
+This is useful for situations where you are containerizing an application,
+directories may be in odd places, or a composer.json might be missing since it
+is unneeded in a final build artifact.
 
 ## Examples
 
