@@ -8,12 +8,11 @@ Drupal Finder provides a class to locate a Drupal installation in a given path.
 ## Usage
 
 ```PHP
-$drupalFinder = new \DrupalFinder\DrupalFinder();
-if ($drupalFinder->locateRoot(getcwd())) {
-    $drupalRoot = $drupalFinder->getDrupalRoot();
-    $composerRoot = $drupalFinder->getComposerRoot();
-    $vendorDir = $drupalFinder->getVendorDir();
-}
+$drupalFinder = new \DrupalFinder\DrupalFinder(getcwd());
+
+$drupalRoot = $drupalFinder->getDrupalRoot();
+$composerRoot = $drupalFinder->getComposerRoot();
+$vendorDir = $drupalFinder->getVendorDir();
 ```
 
 ### Environment variables
