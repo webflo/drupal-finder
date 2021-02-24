@@ -32,7 +32,7 @@ abstract class DrupalFinderTestBase extends TestCase
         $this->envNameVendor = DrupalFinder::ENV_VENDOR_DIR;
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
         // Unset variables to ensure their values don't carry over into other
