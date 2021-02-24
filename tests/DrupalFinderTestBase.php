@@ -4,9 +4,10 @@ namespace DrupalFinder\Tests;
 
 use DrupalFinder\DrupalFinder;
 use Exception;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\SkippedTestError;
+use PHPUnit\Framework\TestCase;
 
-abstract class DrupalFinderTestBase extends PHPUnit_Framework_TestCase
+abstract class DrupalFinderTestBase extends TestCase
 {
     /**
      * @var string
@@ -23,7 +24,7 @@ abstract class DrupalFinderTestBase extends PHPUnit_Framework_TestCase
      */
     protected $envNameVendor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->envNameDrupal = DrupalFinder::ENV_DRUPAL_ROOT;
@@ -160,7 +161,7 @@ abstract class DrupalFinderTestBase extends PHPUnit_Framework_TestCase
      * @param $target
      * @param $link
      *
-     * @throws \PHPUnit_Framework_SkippedTestError
+     * @throws SkippedTestError
      */
     protected function symlink($target, $link)
     {
