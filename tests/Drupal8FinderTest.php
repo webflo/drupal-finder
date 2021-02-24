@@ -93,6 +93,7 @@ class Drupal8FinderTest extends DrupalFinderTestBase
 
     public function testDrupalDefaultStructure()
     {
+        $this->assertTrue(false);
         $root = vfsStream::setup('root', null, $this->prepareFileStructure(static::$fileStructure));
 
         $this->assertTrue($this->finder->locateRoot($root->url()));
