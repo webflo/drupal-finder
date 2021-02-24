@@ -85,7 +85,7 @@ class Drupal8FinderTest extends DrupalFinderTestBase
         return $fileStructure;
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->finder = new \DrupalFinder\DrupalFinder();
