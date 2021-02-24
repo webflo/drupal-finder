@@ -1,6 +1,7 @@
 # Drupal Finder
 
-[![Travis](https://img.shields.io/travis/webflo/drupal-finder.svg)](https://travis-ci.org/webflo/drupal-finder) [![Packagist](https://img.shields.io/packagist/v/webflo/drupal-finder.svg)](https://packagist.org/packages/webflo/drupal-finder)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/webflo/drupal-finder/CI)](https://github.com/webflo/drupal-finder/actions/workflows/ci.yml)
+[![Packagist](https://img.shields.io/packagist/v/webflo/drupal-finder.svg)](https://packagist.org/packages/webflo/drupal-finder)
 
 Drupal Finder provides a class to locate a Drupal installation in a given path.
 
