@@ -128,7 +128,7 @@ abstract class DrupalFinderTestBase extends TestCase
             $path = $dir . $prefix . mt_rand(0, 9999999);
         } while (!mkdir($path, $mode));
         register_shutdown_function(
-            [get_called_class(), 'tempdir_remove'],
+            [static::class, 'tempdir_remove'],
             $path
         );
 
