@@ -25,6 +25,11 @@ class DrupalFinder
     const ENV_VENDOR_DIR = 'DRUPAL_FINDER_VENDOR_DIR';
 
     /**
+     * Vendor directory environment variable.
+     */
+    const ENV_VENDOR_BIN = 'DRUPAL_FINDER_VENDOR_BIN';
+
+    /**
      * Drupal web public directory.
      *
      * @var string
@@ -48,6 +53,15 @@ class DrupalFinder
     private $vendorDir;
 
     /**
+     * Composer vendor bin directory.
+     *
+     * @var string
+     *
+     * @see https://getcomposer.org/doc/06-config.md#vendor-bin
+     */
+    private $vendorBin;
+
+    /**
      * Initialize finder.
      *
      * Optionally pass the starting path.
@@ -64,6 +78,7 @@ class DrupalFinder
         $this->drupalRoot = false;
         $this->composerRoot = false;
         $this->vendorDir = false;
+        $this->vendorBin = false;
 
         // If a starting path was provided, attempt to locate and set path
         // variables.
@@ -128,6 +143,18 @@ class DrupalFinder
     {
         $environment_path = $this->getValidEnvironmentVariablePath(self::ENV_VENDOR_DIR);
         return !empty($environment_path) ? $environment_path : $this->vendorDir;
+    }
+
+    /**
+     * Get the vendor bin.
+     *
+     * @return string|bool
+     *   The path to the vendor bin, if it was found. False otherwise.
+     */
+    public function getVendorBin()
+    {
+        $environment_path = $this->getValidEnvironmentVariablePath(self::ENV_VENDOR_BIN);
+        return !empty($environment_path) ? $environment_path : $this->vendorBin;
     }
 
     /**
@@ -232,6 +259,18 @@ class DrupalFinder
                 $this->vendorDir = $this->composerRoot . '/' . $json['config']['vendor-dir'];
             }
         }
+        if ($this->composerRoot && $this->vendorDir && file_exists($this->composerRoot . '/' . $this->getComposerFileName())) {
+            $json = json_decode(
+                file_get_contents($path . '/' . $this->getComposerFileName()),
+                true
+            );
+            if (is_array($json) && isset($json['config']['bin-dir'])) {
+                $this->vendorBin = $this->composerRoot . '/' . $json['config']['bin-dir'];
+            }
+            elseif ($this->vendorDir) {
+                $this->vendorBin = $this->vendorDir . '/bin';
+            }
+        }
 
         return $this->allPathsDiscovered();
     }
@@ -251,7 +290,7 @@ class DrupalFinder
      *   True if all paths have been discovered, false if one or more haven't been found.
      */
     protected function allPathsDiscovered() {
-        return !empty($this->drupalRoot) && !empty($this->composerRoot) && !empty($this->vendorDir);
+        return !empty($this->drupalRoot) && !empty($this->composerRoot) && !empty($this->vendorDir) && !empty($this->vendorBin);
     }
 
     /**
@@ -261,7 +300,7 @@ class DrupalFinder
      *   True if all paths are known, false if one or more paths are unknown.
      */
     protected function allPathsKnown() {
-        return !empty($this->getDrupalRoot()) && !empty($this->getComposerRoot()) && !empty($this->getVendorDir());
+        return !empty($this->getDrupalRoot()) && !empty($this->getComposerRoot()) && !empty($this->getVendorDir())  && !empty($this->getVendorBin());
     }
 
     /**
