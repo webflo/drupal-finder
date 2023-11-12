@@ -47,7 +47,7 @@ class DrupalFinder
       $return = false;
       if (isset($GLOBALS['_composer_autoload_path'])) {
         $return = realpath(dirname($GLOBALS['_composer_autoload_path']));
-      } elseif (defined(PHPUNIT_COMPOSER_INSTALL)) {
+      } elseif (defined('PHPUNIT_COMPOSER_INSTALL')) {
         $return = realpath(dirname(PHPUNIT_COMPOSER_INSTALL));
       }
       return $return;
