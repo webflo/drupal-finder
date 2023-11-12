@@ -44,8 +44,13 @@ class DrupalFinder
     {
       // See https://getcomposer.org/doc/07-runtime.md#autoloader-path-in-binaries
       // PHPUnit replaces $_composer_autoload_path with its constant in vendor/phpunit/phpunit/phpunit
-      $autoload_path = $GLOBALS['_composer_autoload_path'] ?? PHPUNIT_COMPOSER_INSTALL;
-      return isset($autoload_path) ? realpath(dirname($autoload_path)) : false;
+      $return = false;
+      if (isset($GLOBALS['_composer_autoload_path'])) {
+        $return = realpath(dirname($GLOBALS['_composer_autoload_path']));
+      } elseif (defined(PHPUNIT_COMPOSER_INSTALL)) {
+        $return = realpath(dirname(PHPUNIT_COMPOSER_INSTALL));
+      }
+      return $return;
     }
 
 }
