@@ -13,6 +13,7 @@ $drupalFinder = new \DrupalFinder\DrupalFinder(getcwd());
 $drupalRoot = $drupalFinder->getDrupalRoot();
 $composerRoot = $drupalFinder->getComposerRoot();
 $vendorDir = $drupalFinder->getVendorDir();
+$vendorBin = $drupalFinder->getVendorBin();
 ```
 
 ### Environment variables
@@ -23,12 +24,14 @@ values to determine the paths of the pertinent directories:
 - `DRUPAL_FINDER_DRUPAL_ROOT`
 - `DRUPAL_FINDER_COMPOSER_ROOT`
 - `DRUPAL_FINDER_VENDOR_DIR`
+- `DRUPAL_FINDER_VENDOR_DIR`
 
 For example:
 
 - `DRUPAL_FINDER_DRUPAL_ROOT=/var/www/web`
 - `DRUPAL_FINDER_COMPOSER_ROOT=/var/www`
 - `DRUPAL_FINDER_VENDOR_DIR=/var/www/vendor`
+- `DRUPAL_FINDER_VENDOR_BIN=/var/www/vendor/bin`
 
 This is useful for situations where you are containerizing an application,
 directories may be in odd places, or a composer.json might be missing since it
