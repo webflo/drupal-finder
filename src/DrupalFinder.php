@@ -12,36 +12,29 @@ use Composer\InstalledVersions;
 class DrupalFinder
 {
     /**
-     * Get the Drupal root.
-     *
-     *   The path to the Drupal root, if it was discovered. False otherwise.
+     * Get the Drupal root path.
      */
-    public function getDrupalRoot(): string|bool
+    public function getDrupalRoot(): ?string
     {
       $core = InstalledVersions::getInstallPath('drupal/core');
-      return $core ? realpath(dirname($core)) : false;
+      return $core ? realpath(dirname($core)) : null;
     }
 
     /**
-     * Get the Composer root.
-     *
-     * @return
-     *   The path to the Composer root, if it was discovered. False otherwise.
+     * Get the path to the Composer root directory.
      */
-    public function getComposerRoot(): string|bool
+    public function getComposerRoot(): ?string
     {
-        return realpath(dirname($this->getVendorDir()));
+      $vendor = $this->getVendorDir();
+      return $vendor ? realpath(dirname($vendor)) : null;
     }
 
     /**
      * Get the vendor path.
-     *
-     * @return
-     *   The path to the vendor directory, if it was found. False otherwise.
      */
-    public function getVendorDir(): string|bool
+    public function getVendorDir(): ?string
     {
-      $return = false;
+      $return = null;
       if (isset($GLOBALS['_composer_autoload_path'])) {
         // See https://getcomposer.org/doc/07-runtime.md#autoloader-path-in-binaries
         $return = realpath(dirname($GLOBALS['_composer_autoload_path']));

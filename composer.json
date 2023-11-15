@@ -13,10 +13,12 @@
         "composer-runtime-api": "^2.2",
         "php": ">=8.1"
     },
+    "autoload": {
+        "DrupalFinder\\": "src/"
+    },
     "autoload-dev": {
         "psr-4": {
-            "DrupalFinder\\Tests\\": "tests/",
-            "DrupalFinder\\": "src/"
+            "DrupalFinder\\Tests\\": "tests/"
         }
     },
     "require-dev": {
