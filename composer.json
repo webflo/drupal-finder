@@ -24,21 +24,27 @@
         }
     },
     "require-dev": {
-        "composer/installers": "^2",
-        "drupal/core-recommended": "^10",
-        "phpunit/phpunit": "^9"
+        "phpunit/phpunit": "^10.4"
     },
     "config": {
-        "allow-plugins": {
-            "composer/installers": true
-        },
         "platform": {
             "php": "8.1"
         }
     },
-    "extra": {
-        "installer-paths": {
-            "web/core": ["type:drupal-core"]
-        }
+    "scripts": {
+        "install-fixtures": [
+            "cd tests/fixtures/custom-vendor && composer install",
+            "cd tests/fixtures/default && composer install"
+        ],
+        "uninstall-fixtures": [
+            "rm -rf tests/fixtures/*/composer.lock",
+            "rm -rf tests/fixtures/custom-vendor/foo",
+            "rm -rf tests/fixtures/default/web",
+            "rm -rf tests/fixtures/default/vendor"
+        ],
+        "reinstall-fixtures": [
+            "@uninstall-fixtures",
+            "@install-fixtures"
+        ]
     }
 }

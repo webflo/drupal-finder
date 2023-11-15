@@ -25,8 +25,8 @@ class DrupalFinder
      */
     public function getComposerRoot(): ?string
     {
-      $vendor = $this->getVendorDir();
-      return $vendor ? realpath(dirname($vendor)) : null;
+        $root = InstalledVersions::getRootPackage();
+        return realpath($root['install_path']);
     }
 
     /**
@@ -34,15 +34,8 @@ class DrupalFinder
      */
     public function getVendorDir(): ?string
     {
-      $return = null;
-      if (isset($GLOBALS['_composer_autoload_path'])) {
-        // See https://getcomposer.org/doc/07-runtime.md#autoloader-path-in-binaries
-        $return = realpath(dirname($GLOBALS['_composer_autoload_path']));
-      } elseif (defined('PHPUNIT_COMPOSER_INSTALL')) {
-        // PHPUnit replaces $_composer_autoload_path with its constant in vendor/phpunit/phpunit/phpunit
-        $return = realpath(dirname(PHPUNIT_COMPOSER_INSTALL));
-      }
-      return $return;
+      $reflection = new \ReflectionClass(InstalledVersions::class);
+      return realpath(dirname(dirname($reflection->getFileName())));
     }
 
 }
