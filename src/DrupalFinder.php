@@ -218,6 +218,7 @@ class DrupalFinder
                             }
                             $this->drupalRoot = rtrim($path . '/' . $install_path, '/');
                             $this->vendorDir = $this->composerRoot . '/vendor';
+                            break;
                         }
                     }
                 }
