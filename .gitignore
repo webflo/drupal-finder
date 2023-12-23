@@ -1,3 +1,7 @@
 /composer.lock
 /vendor/
 /.phpunit.result.cache
+/tests/fixtures/custom-vendor/foo
+/tests/fixtures/default/web
+/tests/fixtures/default/vendor
+/tests/fixtures/*/composer.lock
