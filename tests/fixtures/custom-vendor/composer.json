@@ -1,0 +1,17 @@
+{
+  "repositories": {
+    "drupal-finder": {
+      "type": "path",
+      "url": "../../../"
+    }
+  },
+  "require": {
+    "webflo/drupal-finder": "*",
+    "drupal/core": "^10"
+  },
+  "config": {
+    "vendor-dir": "foo/bar"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}

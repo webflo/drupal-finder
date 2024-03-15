@@ -5,6 +5,9 @@ namespace DrupalFinder\Tests;
 use org\bovigo\vfs\vfsStream;
 use DrupalFinder\DrupalFinder;
 
+/**
+ * @deprecated in drupal-finder:1.3.0 and is removed from drupal-finder:2.0.0.
+ */
 class Drupal8FinderTest extends DrupalFinderTestBase
 {
     protected static $fileStructure = [
