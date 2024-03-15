@@ -4,7 +4,7 @@ namespace DrupalFinder\Tests;
 
 use PHPUnit\Framework\TestCase;
 
-class DrupalFinderTest extends TestCase {
+class DrupalFinderComposerRuntimeTest extends TestCase {
 
   protected const installFixtures = 'Execute "composer install-fixtures" first.';
 

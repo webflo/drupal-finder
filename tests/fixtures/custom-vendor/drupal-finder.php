@@ -1,10 +1,10 @@
 <?php
 
-use DrupalFinder\DrupalFinder;
+use DrupalFinder\DrupalFinderComposerRuntime;
 
 require __DIR__ . '/foo/bar/autoload.php';
 
-$finder = new DrupalFinder();
+$finder = new DrupalFinderComposerRuntime();
 
 return json_encode([
     'getComposerRoot' => $finder->getComposerRoot(),
