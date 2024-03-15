@@ -8,7 +8,7 @@ Drupal Finder provides a class to locate a Drupal installation based on Composer
 ## Usage
 
 ```PHP
-$drupalFinder = new \DrupalFinder\DrupalFinder();
+$drupalFinder = new \DrupalFinder\DrupalFinderComposerRuntime();
 
 $drupalRoot = $drupalFinder->getDrupalRoot();
 $composerRoot = $drupalFinder->getComposerRoot();
@@ -17,8 +17,8 @@ $vendorDir = $drupalFinder->getVendorDir();
 
 ## Examples
 
-- [Drupal Console Launcher](https://github.com/hechoendrupal/drupal-console-launcher)
 - [Drush](https://github.com/drush-ops/drush)
+- [phpstan-drupal](https://github.com/mglaman/phpstan-drupal)
 
 ## License
 
