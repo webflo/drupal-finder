@@ -7,6 +7,9 @@ use Exception;
 use PHPUnit\Framework\SkippedTestError;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @deprecated in drupal-finder:1.3.0 and is removed from drupal-finder:2.0.0.
+ */
 abstract class DrupalFinderTestBase extends TestCase
 {
     /**

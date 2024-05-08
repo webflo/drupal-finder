@@ -3,6 +3,7 @@
   <testsuites>
     <testsuite name="DrupalFinder Test Suite">
       <directory>./tests</directory>
+      <exclude>./tests/fixtures</exclude>
     </testsuite>
   </testsuites>
 </phpunit>
