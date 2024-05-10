@@ -89,6 +89,33 @@ class Drupal8FinderTest extends DrupalFinderTestBase
         return $fileStructure;
     }
 
+    protected function getDrupalComposerStructureWithDuplicateInstallerPaths()
+    {
+        $fileStructure = [
+            'web' => static::$fileStructure,
+            'composer.json' => [
+                'require' => [
+                    'drupal/core' => '*',
+                ],
+                'extra' => [
+                    'installer-paths' => [
+                        'web/core' => [
+                            'type:drupal-core',
+                        ],
+                        'core' => [
+                            'type:drupal-core',
+                        ],
+                    ],
+                ],
+            ],
+            'vendor' => [],
+        ];
+        unset($fileStructure['web']['composer.json']);
+        unset($fileStructure['web']['vendor']);
+
+        return $fileStructure;
+    }
+
     public function testDrupalDefaultStructure()
     {
         $finder = new DrupalFinder();
@@ -258,6 +285,27 @@ class Drupal8FinderTest extends DrupalFinderTestBase
         $finder = new DrupalFinder();
         $root = $this->tempdir(sys_get_temp_dir());
         $this->dumpToFileSystem($this->getDrupalComposerStructure(), $root);
+
+        $this->assertTrue($finder->locateRoot($root));
+        $this->assertSame($root . '/web', $finder->getDrupalRoot());
+        $this->assertSame($root, $finder->getComposerRoot());
+        $this->assertSame($root . '/vendor', $finder->getVendorDir());
+
+        // Test symlink implementation
+        $symlink = $this->tempdir(sys_get_temp_dir());
+        $this->symlink($root, $symlink . '/foo');
+
+        $this->assertTrue($finder->locateRoot($symlink . '/foo'));
+        $this->assertSame($root . '/web', $finder->getDrupalRoot());
+        $this->assertSame($root, $finder->getComposerRoot());
+        $this->assertSame($root . '/vendor', $finder->getVendorDir());
+    }
+
+    public function testDrupalComposerStructureWithDuplicateInstallerPaths()
+    {
+        $finder = new DrupalFinder();
+        $root = $this->tempdir(sys_get_temp_dir());
+        $this->dumpToFileSystem($this->getDrupalComposerStructureWithDuplicateInstallerPaths(), $root);
 
         $this->assertTrue($finder->locateRoot($root));
         $this->assertSame($root . '/web', $finder->getDrupalRoot());
