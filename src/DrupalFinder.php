@@ -4,7 +4,6 @@
  * @file
  * Contains \DrupalFinder\DrupalFinder.
  */
-
 namespace DrupalFinder;
 
 /**
@@ -52,6 +51,13 @@ class DrupalFinder
     private $vendorDir;
 
     /**
+     * Starting path.
+     *
+     * @var string
+     */
+    private $start_path_string;
+
+    /**
      * Initialize finder.
      *
      * Optionally pass the starting path.
@@ -62,9 +68,10 @@ class DrupalFinder
      * @throws \Exception
      * @todo Make $start_path mandatory in v2.
      */
-    public function __construct($start_path = null) {
+    public function __construct($start_path_string = null) {
         // Initialize path variables to false, indicating their locations are
         // not yet known.
+        $this->start_path_string = $start_path_string;
         $this->drupalRoot = false;
         $this->composerRoot = false;
         $this->vendorDir = false;
@@ -150,7 +157,7 @@ class DrupalFinder
 
         foreach (array(true, false) as $follow_symlinks) {
             $path = $start_path;
-            if ($follow_symlinks && is_link($path)) {
+            if ($follow_symlinks && is_string($path) && is_link((string) $path)) {
                 $path = realpath($path);
             }
 
@@ -184,8 +191,8 @@ class DrupalFinder
      */
     protected function findAndValidateRoots($path)
     {
-
-        if (!empty($path) && is_dir($path) && file_exists($path . '/autoload.php') && file_exists($path . '/' . $this->getComposerFileName())) {
+        $pathString = $path;
+        if (!empty($pathString) && is_dir($pathString) && file_exists($pathString . '/autoload.php') && file_exists($pathString . '/' . $this->getComposerFileName())) {
             // Additional check for the presence of core/composer.json to
             // grant it is not a Drupal 7 site with a base folder named "core".
             $candidate = 'core/includes/common.inc';
