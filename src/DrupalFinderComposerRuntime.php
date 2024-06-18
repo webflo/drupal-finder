@@ -8,6 +8,7 @@
 namespace DrupalFinder;
 
 use Composer\InstalledVersions;
+use Composer\Autoload\ClassLoader;
 
 class DrupalFinderComposerRuntime
 {
@@ -16,8 +17,8 @@ class DrupalFinderComposerRuntime
      */
     public function getDrupalRoot(): ?string
     {
-      $core = InstalledVersions::getInstallPath('drupal/core');
-      return $core ? realpath(dirname($core)) : null;
+        $core = InstalledVersions::getInstallPath('drupal/core');
+        return $core ? realpath(dirname($core)) : null;
     }
 
     /**
@@ -25,6 +26,11 @@ class DrupalFinderComposerRuntime
      */
     public function getComposerRoot(): ?string
     {
+        foreach (InstalledVersions::getAllRawData() as $data) {
+            if (isset($data['versions']['drupal/core'])) {
+                return realpath($data['root']['install_path']);
+            }
+        }
         $root = InstalledVersions::getRootPackage();
         return realpath($root['install_path']);
     }
@@ -34,8 +40,11 @@ class DrupalFinderComposerRuntime
      */
     public function getVendorDir(): ?string
     {
-      $reflection = new \ReflectionClass(InstalledVersions::class);
-      return realpath(dirname(dirname($reflection->getFileName())));
+        foreach (ClassLoader::getRegisteredLoaders() as $vendorDir => $loader) {
+            if ($loader->findFile(\Drupal::class)) {
+                return realpath($vendorDir);
+            }
+        }
     }
 
 }
