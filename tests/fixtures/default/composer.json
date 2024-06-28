@@ -23,5 +23,13 @@
     }
   },
   "minimum-stability": "dev",
-  "prefer-stable": true
+  "prefer-stable": true,
+  "autoload": {
+    "classmap": [
+      "TestAsComposerScript.php"
+    ]
+  },
+  "scripts": {
+    "dump-drupal-finder": "\\DrupalFinder\\Tests\\Fixtures\\Default\\TestAsComposerScript::dumpDrupalFinder"
+  }
 }
