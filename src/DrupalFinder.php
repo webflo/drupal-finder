@@ -208,7 +208,12 @@ class DrupalFinder
             }
 
             if (is_array($json)) {
-                if (isset($json['extra']['installer-paths']) && is_array($json['extra']['installer-paths'])) {
+                if (!empty($json['extra']['drupal-scaffold']['locations']['web-root'])) {
+                    $web_prefix = rtrim($json['extra']['drupal-scaffold']['locations']['web-root'], '/');
+                    $this->composerRoot = $path;
+                    $this->drupalRoot = $path . '/' . $web_prefix;
+                    $this->vendorDir = $path . '/vendor';
+                } elseif (isset($json['extra']['installer-paths']) && is_array($json['extra']['installer-paths'])) {
                     foreach ($json['extra']['installer-paths'] as $install_path => $items) {
                         if (in_array('type:drupal-core', $items) ||
                             in_array('drupal/core', $items) ||
